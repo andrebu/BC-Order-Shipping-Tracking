@@ -5,12 +5,28 @@
 			url: httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>',
 			type: "post",
 			success: function(xml){
-		        console.log("SUCCESS! --- " + xml);
-		        console.log(xmlToJson(xml));
-		        console.log(JSON.stringify(xmlToJson(xml)));
+		        var trackingJSON = xmlToJson(xml);
 		        var trackingString = JSON.stringify(xmlToJson(xml));
-		        var trackingEvent = trackingString.TrackResponse;
-		        console.log(trackingEvent);
+		        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
+		        var trackSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
+		        var trackingEventTime = trackSummary.EventTime["#text"];
+		        var trackingEventDate = trackSummary.EventDate["#text"];
+		        var trackingEvent = trackSummary.Event["#text"];
+		        var trackingEventCity = trackSummary.EventCity["#text"];
+		        var trackingEventState = trackSummary.EventState["#text"];
+		        var trackingEventEventZIPCode = trackSummary.EventZIPCode["#text"];
+		        var trackingEventEventCountry = trackSummary.EventZIPCode["#text"];
+		        var trackingEventEventFirstName = trackSummary.EventZIPCode["#text"];
+		        var trackingEventEventName = trackSummary.EventZIPCode["#text"];
+		        console.log("Tracking ID:" + trackingID);
+		        console.log("Tracking Event Time:" + trackingEventTime);
+		        console.log("Tracking Event Date:" + trackingEventDate);
+		        console.log("Tracking Event City:" + trackingEventCity);
+		        console.log("Tracking Event State:" + trackingEventState);
+		        console.log("Tracking Event ZIP Code:" + trackingEventEventZIPCode);
+		        console.log("Tracking Event Country:" + trackingEventEventCountry);
+		        console.log("Tracking Event First Name:" + trackingEventEventFirstName);
+		        console.log("Tracking Event Name:" + trackingEventEventName);
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
