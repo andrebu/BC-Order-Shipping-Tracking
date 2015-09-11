@@ -8,6 +8,9 @@
 		        console.log("SUCCESS! --- " + xml);
 		        console.log(xmlToJson(xml));
 		        console.log(JSON.stringify(xmlToJson(xml)));
+		        var trackingString = JSON.stringify(xmlToJson(xml));
+		        var trackingEvent = trackingString.TrackResponse;
+		        console.log(trackingEvent);
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
