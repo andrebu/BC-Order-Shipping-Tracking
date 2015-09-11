@@ -7,6 +7,7 @@
 			success: function(xml){
 		        console.log("SUCCESS! --- " + xml);
 		        console.log(xmlToJson(xml));
+		        console.log(JSON.stringify(xmlToJson(xml)));
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
