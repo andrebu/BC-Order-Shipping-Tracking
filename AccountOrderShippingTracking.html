@@ -6,10 +6,10 @@
 			type: "post",
 			dataType: "json",
 			success: function(xml){
-		        console.log(xmlToJson(xml));
+		        console.log("SUCCESS! --- " + xml);
 			},
 			error: function(xhr, textStatus, errorThrown){
-		        console.log(xhr.responseText);
+		        console.log("Error? --- " + xhr.responseText);
 			}
 		});
 	}
