@@ -9,18 +9,19 @@
 		        var trackingString = JSON.stringify(xmlToJson(xml));
 		        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
 		        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
-		        var trackSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
-		        var trackingEventTime = trackSummary.EventTime["#text"];
-		        var trackingEventDate = trackSummary.EventDate["#text"];
-		        var trackingEvent = trackSummary.Event["#text"];
-		        var trackingEventCity = trackSummary.EventCity["#text"];
-		        var trackingEventState = trackSummary.EventState["#text"];
-		        var trackingEventEventZIPCode = trackSummary.EventZIPCode["#text"];
-		        var trackingEventEventCountry = trackSummary.EventCountry["#text"];
+		        var trackingSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
+		        var trackingSumEventTime = trackingSummary.EventTime["#text"];
+		        var trackingSumEventDate = trackingSummary.EventDate["#text"];
+		        var trackingSumEvent = trackingSummary.Event["#text"];
+		        var trackingSumEventCity = trackingSummary.EventCity["#text"];
+		        var trackingSumEventState = trackingSummary.EventState["#text"];
+		        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"];
+		        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"];
 /*
-		        var trackingEventEventFirstName = trackSummary.FirstName["#text"];
-		        var trackingEventEventName = trackSummary.Name["#text"];
+		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
+		        var trackingSumEventEventName = trackingSummary.Name["#text"];
 */
+		        console.log(trackingJSON);
 		        console.log("Full JSON:" + trackingString);
 		        console.log("Tracking ID:" + trackingID);
 				if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
@@ -29,18 +30,32 @@
 				}
 				console.log('TRACKING SUMMARY:');
 				console.log('========================================');
-		        console.log("Tracking Event Time:" + trackingEventTime);
-		        console.log("Tracking Event Date:" + trackingEventDate);
-		        console.log("Tracking Event City:" + trackingEventCity);
-		        console.log("Tracking Event State:" + trackingEventState);
-		        console.log("Tracking Event ZIP Code:" + trackingEventEventZIPCode);
-		        console.log("Tracking Event Country:" + trackingEventEventCountry);
+		        console.log("Tracking Event Time:" + trackingSumEventTime);
+		        console.log("Tracking Event Date:" + trackingSumEventDate);
+		        console.log("Tracking Event City:" + trackingSumEventCity);
+		        console.log("Tracking Event State:" + trackingSumEventState);
+		        console.log("Tracking Event ZIP Code:" + trackingSumEventEventZIPCode);
+		        console.log("Tracking Event Country:" + trackingSumEventEventCountry);
 /*
-		        console.log("Tracking Event First Name:" + trackingEventEventFirstName);
-		        console.log("Tracking Event Name:" + trackingEventEventName);
+		        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
+		        console.log("Tracking Event Name:" + trackingSumEventEventName);
 */
 				console.log('========================================');
 				console.log('/////   END OF TRACKING SUMMARY:');
+		        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail;
+				console.log('========================================');
+				console.log('========================================');
+				console.log('========================================');
+				console.log('TRACKING DETAILS:');
+				console.log('========================================');
+		        console.log('Tracking Details JSON:' + trackingDetails);
+				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
+					console.log('Tracking Step: ' + trackingStepID);
+					console.log(TrackingStepDetails);
+					$.each(TrackingStepDetails, function( index, value ) {
+						console.log( index + ": " + value["#text"] );
+					});
+				});
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
