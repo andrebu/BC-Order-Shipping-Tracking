@@ -7,6 +7,7 @@
 			success: function(xml){
 		        var trackingJSON = xmlToJson(xml);
 		        var trackingString = JSON.stringify(xmlToJson(xml));
+		        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
 		        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
 		        var trackSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
 		        var trackingEventTime = trackSummary.EventTime["#text"];
@@ -15,18 +16,31 @@
 		        var trackingEventCity = trackSummary.EventCity["#text"];
 		        var trackingEventState = trackSummary.EventState["#text"];
 		        var trackingEventEventZIPCode = trackSummary.EventZIPCode["#text"];
-		        var trackingEventEventCountry = trackSummary.EventZIPCode["#text"];
-		        var trackingEventEventFirstName = trackSummary.EventZIPCode["#text"];
-		        var trackingEventEventName = trackSummary.EventZIPCode["#text"];
+		        var trackingEventEventCountry = trackSummary.EventCountry["#text"];
+/*
+		        var trackingEventEventFirstName = trackSummary.FirstName["#text"];
+		        var trackingEventEventName = trackSummary.Name["#text"];
+*/
+		        console.log("Full JSON:" + trackingString);
 		        console.log("Tracking ID:" + trackingID);
+				if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
+					var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
+					console.log("Guaranteed Delivery Date:" + guarDelDate);
+				}
+				console.log('TRACKING SUMMARY:');
+				console.log('========================================');
 		        console.log("Tracking Event Time:" + trackingEventTime);
 		        console.log("Tracking Event Date:" + trackingEventDate);
 		        console.log("Tracking Event City:" + trackingEventCity);
 		        console.log("Tracking Event State:" + trackingEventState);
 		        console.log("Tracking Event ZIP Code:" + trackingEventEventZIPCode);
 		        console.log("Tracking Event Country:" + trackingEventEventCountry);
+/*
 		        console.log("Tracking Event First Name:" + trackingEventEventFirstName);
 		        console.log("Tracking Event Name:" + trackingEventEventName);
+*/
+				console.log('========================================');
+				console.log('/////   END OF TRACKING SUMMARY:');
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
