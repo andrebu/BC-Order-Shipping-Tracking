@@ -10,6 +10,14 @@
 		text-transform: uppercase; 
 		width: 33%;
 	}
+	#AccountOrder .tracking-table .summary-row {
+		color: #fff;
+		background-color: #429fcc;
+		padding: 20px;
+		border-radius: 3px;
+		text-align: center;
+		height: 50px;
+    }
 	#AccountOrder .tracking-table tbody {
 		font-size: 12px;
 	}
@@ -33,12 +41,10 @@
 	function USPSTracking() {
 		function trackingLink() {
 			var rawTrackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-			console.log(rawTrackingNumber.length);
 			if (rawTrackingNumber.length == 22) {
 				var trackingAnchorLink = '<a href="https://tools.usps.com/go/TrackConfirmAction.action?tLabels='; 
 				trackingAnchorLink += '' + rawTrackingNumber + '" target="_blank" class="green">' + rawTrackingNumber + '</a>';
 				$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
-				console.log('ALLOOOO ' + trackingAnchorLink);
 			}
 		}
 		trackingLink();
@@ -63,7 +69,28 @@
 		        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
 		        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
 				var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
-				//<td colspan="3"><span>hello</span></td>
+/*
+				if (trackingSumEvent.hasOwnProperty('Delivered')) {
+					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');
+				}
+*/
+				function getObjects(obj, key, val) {
+					var objects = [];
+					for (var i in obj) {
+						if (!obj.hasOwnProperty(i)) continue;
+						if (typeof obj[i] == 'object') {
+							objects = objects.concat(getObjects(obj[i], key, val));
+						} else if (i == key && obj[key] == val) {
+							objects.push(obj);
+						}
+					}
+					return objects;
+				}				
+				var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
+				if (shipmentDelivered) {
+					//<td colspan="3"><span>hello</span></td>
+					tableRows += '<tr class="summary-row"><td colspan="3"><span>hello</span></td>';
+				}
 /*
 		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
 		        var trackingSumEventEventName = trackingSummary.Name["#text"];
