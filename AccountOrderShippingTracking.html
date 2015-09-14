@@ -1,3 +1,20 @@
+<style>
+	#AccountOrder .tracking-table {
+		border: solid 3px #ececec;
+	}
+	#AccountOrder .tracking-table thead {
+		background: #39b54a;
+	}
+	#AccountOrder .tracking-table tr.odd {
+		background: #f5f5f5;
+	}
+/*
+	#AccountOrder .tracking-table {
+	#AccountOrder .tracking-table {
+	#AccountOrder .tracking-table {
+	#AccountOrder .tracking-table {
+*/
+</style>
 <script type="text/javascript">
 	function USPSTracking() {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
@@ -50,10 +67,10 @@
 				console.log('========================================');
 		        console.log('Tracking Details JSON:' + trackingDetails);
 				var tableRows = '';
+				var odd_even = false;
 				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
 					console.log('Tracking Step: ' + trackingStepID);
 					console.log(TrackingStepDetails);
-					var odd_even = false;
 					$.each(TrackingStepDetails, function( index, value ) {
 						//console.log( index + ": " + value["#text"] );
 					});
@@ -70,16 +87,16 @@
 			        odd_even = !odd_even;               
 				});
 				var pageEnd = $('#AccountOrder .BlockContent');
-				var tableHead = '<tr class="header">' +
-								'<th scope="col" class="date-time" style="width:33%">' +
+				var tableHead = '<thead><tr class="tbl-head">' +
+								'<th scope="col" class="tbl-date-time" style="width:33%">' +
 									'<div class="thpad">Date &amp; Time</div></th>' +
-								'<th scope="col" class="status" style="width:33%">' +
+								'<th scope="col" class="tbl-status" style="width:33%">' +
 									'<div class="thpad">Status of Item</div></th>' +
-								'<th scope="col" class="location" style="width:33%">' +
+								'<th scope="col" class="tbl-location" style="width:33%">' +
 								'<div class="thpad">Location</div></th>' +
-							'</tr>';
+							'</tr></thead>';
 				var tableBody = '<tbody>' + tableRows + '</tbody>';
-				var trackingTable = '<table class="USPS-table" style="display:none;">' +  tableHead + tableBody + tableRows + '</table>';
+				var trackingTable = '<table class="USPS-table tracking-table" style="display:none;">' +  tableHead + tableBody + '</table>';
 				pageEnd.append(trackingTable);
 			},
 			error: function(xhr, textStatus, errorThrown){
