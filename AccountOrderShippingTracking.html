@@ -52,9 +52,34 @@
 				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
 					console.log('Tracking Step: ' + trackingStepID);
 					console.log(TrackingStepDetails);
+					var odd_even = false;
+					var tableRows = '';
 					$.each(TrackingStepDetails, function( index, value ) {
 						console.log( index + ": " + value["#text"] );
+				        var detailEventDate = TrackingStepDetails.EventDate["#text"];
+				        var detailEventTime = TrackingStepDetails.EventTime["#text"];
+				        var detailEvent = TrackingStepDetails.Event["#text"];
+				        var detailEventCity = TrackingStepDetails.EventCity["#text"];
+				        var detailEventState = TrackingStepDetails.EventState["#text"];
+				        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
+						var dateTimeRow = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+						var statusRow = '<td>' + detailEvent + '</td>';
+						var locRow = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+				        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeRow+statusRow+locRow+'</tr>';
+				        odd_even = !odd_even;               
 					});
+					var pageEnd = $('#AccountOrder .BlockContent');
+					var tableHead = '<tr class="header">' +
+									'<th scope="col" class="date-time" style="width:33%">' +
+										'<div class="thpad">Date &amp; Time</div></th>' +
+									'<th scope="col" class="status" style="width:33%">' +
+										'<div class="thpad">Status of Item</div></th>' +
+									'<th scope="col" class="location" style="width:33%">' +
+									'<div class="thpad">Location</div></th>' +
+								'</tr>';
+					var tableBody = '<tbody>' + tableRows + '</tbody>';
+					var trackingTable = '<table class="USPS-table" style="display:none;">' +  tableHead + tableBody + tableRows + '</table>';
+					pageEnd.append(trackingTable);
 				});
 			},
 			error: function(xhr, textStatus, errorThrown){
