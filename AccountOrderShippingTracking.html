@@ -209,7 +209,6 @@
 			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
 			        odd_even = !odd_even;               
 				});
-				var pageEnd = $('#AccountOrder .BlockContent');
 				var tableHead = '<thead><tr class="tbl-head">' +
 								'<th scope="col" class="tbl-date-time">' +
 									'<div class="thpad">Date &amp; Time</div></th>' +
@@ -228,9 +227,16 @@
 		});
 	}
 	
+	function trackerLine() {
+		var trckerLineHTML = '<div style="display:none;" class="tracker-line-container"><div class="tracker-line"><div class="package-status" data-width="">' 
+							+ '</div><i class="dot delivery-dot"></i></div></div>';
+		pageEnd.append(trckerLineHTML);
+	}
+	
 	function getTrackingInfo(shippingTrackingNumber) {
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
+			trackerLine();
 			USPSTracking(shippingTrackingNumber);
 		} /*
 else if {
@@ -240,7 +246,8 @@ else if {
 		}
 */
 	}
-	
+
+	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
 	getTrackingInfo(trackingNumber);
 	
