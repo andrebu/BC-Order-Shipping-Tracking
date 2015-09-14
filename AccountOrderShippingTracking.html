@@ -4,9 +4,17 @@
 	}
 	#AccountOrder .tracking-table thead {
 		background: #39b54a;
+		color: #fff;
+	}
+	#AccountOrder .tracking-table tr th {
+		text-transform: uppercase; 
+		width: 33%;
 	}
 	#AccountOrder .tracking-table tr.odd {
 		background: #f5f5f5;
+	}
+	#AccountOrder .tracking-table td {
+		border: 0;
 	}
 /*
 	#AccountOrder .tracking-table {
@@ -80,19 +88,27 @@
 			        var detailEventCity = TrackingStepDetails.EventCity["#text"];
 			        var detailEventState = TrackingStepDetails.EventState["#text"];
 			        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
-					var dateTimeRow = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+					if (typeof detailEventTime !== 'undefined') {
+						var dateTimeRow = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+					} else {
+						var dateTimeRow = '<td>' + detailEventDate + '</td>';
+					}
 					var statusRow = '<td>' + detailEvent + '</td>';
-					var locRow = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+					if (typeof detailEventCity !== 'undefined') {
+						var locRow = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+					} else {
+						var locRow = '<td></td>';
+					}
 			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeRow+statusRow+locRow+'</tr>';
 			        odd_even = !odd_even;               
 				});
 				var pageEnd = $('#AccountOrder .BlockContent');
 				var tableHead = '<thead><tr class="tbl-head">' +
-								'<th scope="col" class="tbl-date-time" style="width:33%">' +
+								'<th scope="col" class="tbl-date-time">' +
 									'<div class="thpad">Date &amp; Time</div></th>' +
-								'<th scope="col" class="tbl-status" style="width:33%">' +
+								'<th scope="col" class="tbl-status">' +
 									'<div class="thpad">Status of Item</div></th>' +
-								'<th scope="col" class="tbl-location" style="width:33%">' +
+								'<th scope="col" class="tbl-location">' +
 								'<div class="thpad">Location</div></th>' +
 							'</tr></thead>';
 				var tableBody = '<tbody>' + tableRows + '</tbody>';
