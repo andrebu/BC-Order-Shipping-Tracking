@@ -297,13 +297,15 @@
 	}
 	
 	function trackerLine() {
+		var trackerTop = '';
 		var orderDate = '%%GLOBAL_OrderDate%%';
-		console.log(orderDate);
+		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
 		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
 		var shippingAddress = $('.ShippingDetails').text();
 		console.log(shippingAddress);
-		var trackerTop = '';
-		var trackerBottom = '<div class="bottom" style="height: 19px;"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDate+'</span></span><span class="delivery-status"><span class="delivery-date"></span><span class="delivery-address"></span></span></div>';
+		var shippedDate = (orderDelivered ? 'Some Date' : '');
+		console.log('Shipped Date is: ' + shippedDate);
+		var trackerBottom = '<div class="bottom" style="height: 19px;"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>	<span class="shipped-status" data-position=""><i class="marker"></i>Shipped<span class="shipped-date">'+ +'</span></span><span class="delivery-status"><span class="delivery-date"></span><span class="delivery-address"></span></span></div>';
 		var trackerLineHTML = '<div style="display:none;" class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
 							+ '</div><i class="dot latest-event-dot" data-position="37.7119651571363" style="left: 334.950079445654px; visibility: visible; opacity: 1; display: inline; transform: translateX(0.950079445653955px) translateZ(0px);"></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
@@ -325,6 +327,7 @@ else if {
 
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
+	var orderDelivered = false;
 	getTrackingInfo(trackingNumber);
 	
 </script>​​​​​​
