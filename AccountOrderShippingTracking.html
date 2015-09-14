@@ -24,7 +24,20 @@
 */
 </style>
 <script type="text/javascript">
+	//http://fedex.com/Tracking?action=track&language=english&cntry_code=us&tracknumbers=put_tracking_number_here
+	//http://wwwapps.ups.com/WebTracking/track?loc=en_US&track.x=Track&trackNums=put_tracking_number_here
 	function USPSTracking() {
+		function trackingLink() {
+			var rawTrackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
+			console.log(rawTrackingNumber.length);
+			if (rawTrackingNumber.length == 22) {
+				var trackingAnchorLink = '<a href="https://tools.usps.com/go/TrackConfirmAction.action?tLabels='; 
+				trackingAnchorLink += '' + rawTrackingNumber + '" target="_blank">' + rawTrackingNumber + '</a>';
+				$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
+				console.log('ALLOOOO ' + trackingAnchorLink);
+			}
+		}
+		trackingLink();
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
 		$.ajax({
 			url: httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>',
