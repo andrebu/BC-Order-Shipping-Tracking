@@ -32,7 +32,7 @@
 			console.log(rawTrackingNumber.length);
 			if (rawTrackingNumber.length == 22) {
 				var trackingAnchorLink = '<a href="https://tools.usps.com/go/TrackConfirmAction.action?tLabels='; 
-				trackingAnchorLink += '' + rawTrackingNumber + '" target="_blank">' + rawTrackingNumber + '</a>';
+				trackingAnchorLink += '' + rawTrackingNumber + '" target="_blank" class="green">' + rawTrackingNumber + '</a>';
 				$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 				console.log('ALLOOOO ' + trackingAnchorLink);
 			}
