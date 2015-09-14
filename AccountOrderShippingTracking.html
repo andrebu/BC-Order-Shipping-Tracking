@@ -10,11 +10,15 @@
 		text-transform: uppercase; 
 		width: 33%;
 	}
+	#AccountOrder .tracking-table tbody {
+		font-size: 12px;
+	}
 	#AccountOrder .tracking-table tr.odd {
 		background: #f5f5f5;
 	}
 	#AccountOrder .tracking-table td {
 		border: 0;
+		padding: 10px 20px;
 	}
 /*
 	#AccountOrder .tracking-table {
@@ -55,6 +59,11 @@
 		        var trackingSumEventState = trackingSummary.EventState["#text"];
 		        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"];
 		        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"];
+		        var sumDateTimeCol = '<td>' + trackingSumEventDate + ', ' + trackingSumEventTime + '</td>';
+		        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
+		        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
+				var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
+				//<td colspan="3"><span>hello</span></td>
 /*
 		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
 		        var trackingSumEventEventName = trackingSummary.Name["#text"];
@@ -87,8 +96,7 @@
 				console.log('TRACKING DETAILS:');
 				console.log('========================================');
 		        console.log('Tracking Details JSON:' + trackingDetails);
-				var tableRows = '';
-				var odd_even = false;
+				var odd_even = true;
 				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
 					console.log('Tracking Step: ' + trackingStepID);
 					console.log(TrackingStepDetails);
@@ -102,17 +110,17 @@
 			        var detailEventState = TrackingStepDetails.EventState["#text"];
 			        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
 					if (typeof detailEventTime !== 'undefined') {
-						var dateTimeRow = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+						var dateTimeCol = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
 					} else {
-						var dateTimeRow = '<td>' + detailEventDate + '</td>';
+						var dateTimeCol = '<td>' + detailEventDate + '</td>';
 					}
-					var statusRow = '<td>' + detailEvent + '</td>';
+					var statusCol = '<td>' + detailEvent + '</td>';
 					if (typeof detailEventCity !== 'undefined') {
-						var locRow = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+						var locCol = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
 					} else {
-						var locRow = '<td></td>';
+						var locCol = '<td></td>';
 					}
-			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeRow+statusRow+locRow+'</tr>';
+			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
 			        odd_even = !odd_even;               
 				});
 				var pageEnd = $('#AccountOrder .BlockContent');
