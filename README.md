@@ -59,10 +59,16 @@ BC Order Shipping Tracking
 - [typeof !== “undefined” vs. != null](http://stackoverflow.com/questions/2703102/typeof-undefined-vs-null)
 - [Check if a key exists inside a json object](http://stackoverflow.com/questions/20804163/check-if-a-key-exists-inside-a-json-object)
 - [How do I iterate over a JSON structure?](http://stackoverflow.com/questions/1078118/how-do-i-iterate-over-a-json-structure)
+- [Convert JSON array to an HTML table in jQuery](http://stackoverflow.com/questions/1051061/convert-json-array-to-an-html-table-in-jquery)
+- [Tracking API for Fedex and UPS [closed]](http://stackoverflow.com/questions/5879953/tracking-api-for-fedex-and-ups)
+- [Append to string variable [closed]](http://stackoverflow.com/questions/1288095/append-to-string-variable)
+- [use jQuery's find() on JSON object](http://stackoverflow.com/questions/4992383/use-jquerys-find-on-json-object)
+- []()
 - []()
 - []()
 ###FedEx
 - [Parsing HTML does not output desired data(tracking info for FedEx)](http://stackoverflow.com/questions/18817185/parsing-html-does-not-output-desired-datatracking-info-for-fedex)
+- []()
 - []()
 - []()
 ###UPS
