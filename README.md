@@ -45,6 +45,7 @@ BC Order Shipping Tracking
 
 
 ##Resources
+###USPS
 - [Welcome to the Web Tools API Portal](https://www.usps.com/business/web-tools-apis/welcome.htm#GeneralWebToolsFAQs)
 - [Track & Confirm API -- Version 3.2](https://www.usps.com/business/web-tools-apis/track-and-confirm-api.htm#_Toc422927542)
 - [Obtaining USPS orders tracking status with PHP](http://stackoverflow.com/questions/21463532/obtaining-usps-orders-tracking-status-with-php)
@@ -52,7 +53,20 @@ BC Order Shipping Tracking
 - [help with accessing nodes at a json file in javascript](http://stackoverflow.com/questions/6967170/help-with-accessing-nodes-at-a-json-file-in-javascript)
 - [JSON Viewer](http://jsonviewer.stack.hu/)
 - [Merchandise Return V4.0 Label API](https://www.usps.com/business/web-tools-apis/merchandise-return-service-label-api.htm)
+- [JSON.Parse,'Uncaught SyntaxError: Unexpected token o](http://stackoverflow.com/questions/19239217/json-parse-uncaught-syntaxerror-unexpected-token-o)
+- [$.getJSON return array object has special characters](https://forum.jquery.com/topic/getjson-return-array-object-has-special-characters)
+- [How to access to a json object value when the key like 'foo$bar'](http://stackoverflow.com/questions/7609238/how-to-access-to-a-json-object-value-when-the-key-like-foobar)
+- [typeof !== “undefined” vs. != null](http://stackoverflow.com/questions/2703102/typeof-undefined-vs-null)
+- [Check if a key exists inside a json object](http://stackoverflow.com/questions/20804163/check-if-a-key-exists-inside-a-json-object)
+- [How do I iterate over a JSON structure?](http://stackoverflow.com/questions/1078118/how-do-i-iterate-over-a-json-structure)
+- []()
+- []()
+###FedEx
 - [Parsing HTML does not output desired data(tracking info for FedEx)](http://stackoverflow.com/questions/18817185/parsing-html-does-not-output-desired-datatracking-info-for-fedex)
+- []()
+- []()
+###UPS
+- []()
 - []()
 - []()
 
