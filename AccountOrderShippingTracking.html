@@ -10,13 +10,28 @@
 		text-transform: uppercase; 
 		width: 33%;
 	}
+	#AccountOrder .tracking-table .pre-sum-row td {
+		padding: 0; 
+	}
+	#AccountOrder .tracking-table .summary-triangle {
+		width: 0px;
+		height: 0px;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+		border-bottom: 10px solid #429fcc;
+		display: block;
+		position: relative;
+		top: 3px;
+		margin: 0 auto;
+	}
 	#AccountOrder .tracking-table .summary-row {
 		color: #fff;
 		background-color: #429fcc;
 		padding: 20px;
 		border-radius: 3px;
 		text-align: center;
-		height: 50px;
+		font-size: 13px;
+		height: 80px;
     }
 	#AccountOrder .tracking-table tbody {
 		font-size: 12px;
@@ -88,8 +103,11 @@
 				}				
 				var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
 				if (shipmentDelivered) {
-					//<td colspan="3"><span>hello</span></td>
-					tableRows += '<tr class="summary-row"><td colspan="3"><span>hello</span></td>';
+					var summaryRowText = 'Your item was delivered at the front door or porch at '+trackingSumEventTime+' ';
+					summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
+					summaryRowText += ''+trackingSumEventEventZIPCode+'';
+					tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
+					tableRows += '<tr class="summary-row"><td colspan="3"><span>'+summaryRowText+'</span></td>';
 				}
 /*
 		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
