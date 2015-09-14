@@ -1,6 +1,7 @@
 <style>
 	/* Tracker Line CSS */
 	#AccountOrder .tracker-container {
+		position: relative;
 		padding: 0 0 26px 0;
 	}
 	#AccountOrder .tracker-container .tracker-line {
@@ -42,6 +43,14 @@
 		z-index: 10;
 		background: #003700;
 	}
+	#AccountOrder .tracker-container .bottom { 
+		position: relative;
+		width: 100%;
+		display: block;
+		min-height: 1em;
+		font-size: 13px;
+		font-weight: 700;
+	}
 	#AccountOrder .tracker-container .bottom .delivery-status, 
 	#AccountOrder .tracker-container .bottom .ordered-status, 
 	#AccountOrder .tracker-container .bottom .shipped-status, 
@@ -50,6 +59,13 @@
 		position: absolute;
 		top: 0;
 		background: #fff;
+	}
+	#AccountOrder .tracker-container .bottom .delivery-address, 
+	#AccountOrder .tracker-container .bottom .ordered-date, 
+	#AccountOrder .tracker-container .bottom .shipped-date, 
+	#AccountOrder .tracker-container .bottom .summary-text {
+		font-weight: 400;
+		display: block;
 	}
 	/* Tracking Table CSS */
 	#AccountOrder .tracking-table {
@@ -281,8 +297,13 @@
 	}
 	
 	function trackerLine() {
+		var orderDate = '%%GLOBAL_OrderDate%%';
+		console.log(orderDate);
+		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
+		var shippingAddress = $('.ShippingDetails').text();
+		console.log(shippingAddress);
 		var trackerTop = '';
-		var trackerBottom = '<div class="bottom" style="height: 19px;"><span class="ordered-status">Ordered<span class="ordered-date"></span></span><span class="delivery-status"><span class="delivery-date"></span><span class="delivery-address"></span></span></div>';
+		var trackerBottom = '<div class="bottom" style="height: 19px;"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDate+'</span></span><span class="delivery-status"><span class="delivery-date"></span><span class="delivery-address"></span></span></div>';
 		var trackerLineHTML = '<div style="display:none;" class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
 							+ '</div><i class="dot latest-event-dot" data-position="37.7119651571363" style="left: 334.950079445654px; visibility: visible; opacity: 1; display: inline; transform: translateX(0.950079445653955px) translateZ(0px);"></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
@@ -304,10 +325,6 @@ else if {
 
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-	var orderDate = '%%GLOBAL_OrderDate%%';
-	console.log(orderDate);
-	//var shippingAddress = ('%%GLOBAL_ShippingAddress%%').text();
-	//console.log(shippingAddress);
 	getTrackingInfo(trackingNumber);
 	
 </script>​​​​​​
