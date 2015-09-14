@@ -18,7 +18,7 @@
 		height: 0px;
 		border-left: 10px solid transparent;
 		border-right: 10px solid transparent;
-		border-bottom: 10px solid #429fcc;
+		border-bottom: 10px solid #42CC66;
 		display: block;
 		position: relative;
 		top: 3px;
@@ -26,13 +26,19 @@
 	}
 	#AccountOrder .tracking-table .summary-row {
 		color: #fff;
-		background-color: #429fcc;
-		padding: 20px;
-		border-radius: 3px;
 		text-align: center;
 		font-size: 13px;
 		height: 80px;
     }
+	#AccountOrder .tracking-table .summary-row td {
+		padding-top: 0;
+	}
+	#AccountOrder .tracking-table .summary-row td div {
+		background-color: #42CC66;
+		height: 40px;
+		padding: 20px;
+		border-radius: 4px;
+	}
 	#AccountOrder .tracking-table tbody {
 		font-size: 12px;
 	}
@@ -51,18 +57,53 @@
 */
 </style>
 <script type="text/javascript">
-	//http://fedex.com/Tracking?action=track&language=english&cntry_code=us&tracknumbers=put_tracking_number_here
-	//http://wwwapps.ups.com/WebTracking/track?loc=en_US&track.x=Track&trackNums=put_tracking_number_here
-	function USPSTracking() {
-		function trackingLink() {
-			var rawTrackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-			if (rawTrackingNumber.length == 22) {
-				var trackingAnchorLink = '<a href="https://tools.usps.com/go/TrackConfirmAction.action?tLabels='; 
-				trackingAnchorLink += '' + rawTrackingNumber + '" target="_blank" class="green">' + rawTrackingNumber + '</a>';
-				$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
+	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
+	function makeTrackingLink(carrierCompany, shippingTrackingNumber) {
+		var anchorLink = {'USPS':'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=',
+						  'FedEx':'http://fedex.com/Tracking?action=track&language=english&cntry_code=us&tracknumbers=',
+						  'UPS':'http://wwwapps.ups.com/WebTracking/track?loc=en_US&track.x=Track&trackNums='};
+		var trackingAnchorLink = '<a href="' + anchorLink[carrierCompany]; 
+		trackingAnchorLink += '' + shippingTrackingNumber + '" target="_blank" class="green">' + shippingTrackingNumber + '</a>';
+		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
+	}
+
+	// Changes XML to JSON
+	function xmlToJson(xml) {
+		// Create the return object
+		var obj = {};
+		if (xml.nodeType == 1) { // element
+			// do attributes
+			if (xml.attributes.length > 0) {
+			obj["@attributes"] = {};
+				for (var j = 0; j < xml.attributes.length; j++) {
+					var attribute = xml.attributes.item(j);
+					obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+				}
+			}
+		} else if (xml.nodeType == 3) { // text
+			obj = xml.nodeValue;
+		}
+		// do children
+		if (xml.hasChildNodes()) {
+			for(var i = 0; i < xml.childNodes.length; i++) {
+				var item = xml.childNodes.item(i);
+				var nodeName = item.nodeName;
+				if (typeof(obj[nodeName]) == "undefined") {
+					obj[nodeName] = xmlToJson(item);
+				} else {
+					if (typeof(obj[nodeName].push) == "undefined") {
+						var old = obj[nodeName];
+						obj[nodeName] = [];
+						obj[nodeName].push(old);
+					}
+					obj[nodeName].push(xmlToJson(item));
+				}
 			}
 		}
-		trackingLink();
+		return obj;
+	};
+
+	function USPSTracking(shippingTrackingNumber) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
 		$.ajax({
 			url: httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>',
@@ -107,7 +148,7 @@
 					summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
 					summaryRowText += ''+trackingSumEventEventZIPCode+'';
 					tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
-					tableRows += '<tr class="summary-row"><td colspan="3"><span>'+summaryRowText+'</span></td>';
+					tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
 				}
 /*
 		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
@@ -186,41 +227,21 @@
 			}
 		});
 	}
-	USPSTracking();
 	
-	// Changes XML to JSON
-	function xmlToJson(xml) {
-		// Create the return object
-		var obj = {};
-		if (xml.nodeType == 1) { // element
-			// do attributes
-			if (xml.attributes.length > 0) {
-			obj["@attributes"] = {};
-				for (var j = 0; j < xml.attributes.length; j++) {
-					var attribute = xml.attributes.item(j);
-					obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-				}
-			}
-		} else if (xml.nodeType == 3) { // text
-			obj = xml.nodeValue;
+	function getTrackingInfo(shippingTrackingNumber) {
+		if (shippingTrackingNumber.length == 22) {
+			makeTrackingLink("USPS", shippingTrackingNumber);
+			USPSTracking(shippingTrackingNumber);
+		} /*
+else if {
+			
+		} else if {
+			
 		}
-		// do children
-		if (xml.hasChildNodes()) {
-			for(var i = 0; i < xml.childNodes.length; i++) {
-				var item = xml.childNodes.item(i);
-				var nodeName = item.nodeName;
-				if (typeof(obj[nodeName]) == "undefined") {
-					obj[nodeName] = xmlToJson(item);
-				} else {
-					if (typeof(obj[nodeName].push) == "undefined") {
-						var old = obj[nodeName];
-						obj[nodeName] = [];
-						obj[nodeName].push(old);
-					}
-					obj[nodeName].push(xmlToJson(item));
-				}
-			}
-		}
-		return obj;
-	};
+*/
+	}
+	
+	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
+	getTrackingInfo(trackingNumber);
+	
 </script>​​​​​​
