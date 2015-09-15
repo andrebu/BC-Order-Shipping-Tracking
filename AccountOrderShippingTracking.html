@@ -325,12 +325,29 @@
 				var alreadyAccepted = $(trackingStringNoCurls).find('Accepted');
 				console.log(alreadyAccepted);
 				var found;
-				var trueArray = Array.prototype.slice.call(trackingResponse, 0);
-					console.log("trueArray --- " + trueArray);
-				for(var value in obj) {
-					if(obj.hasOwnProperty(key)) {
-					
+				for(var value in trackingResponse) {
+					if(trackingResponse.hasOwnProperty('Accepted')) {
+						console.log('Hello!!!!!');
+						console.log(this);
 					}
+				}
+				function getObjects(obj, key, val) {
+				    var objects = [];
+				    for (var i in obj) {
+				        if (!obj.hasOwnProperty(i)) continue;
+				        if (typeof obj[i] == 'object') {
+				            objects = objects.concat(getObjects(obj[i], key, val));
+				        } else if (i == key && obj[key] == val) {
+				            objects.push(obj);
+				        }
+				    }
+				    return objects;
+				}
+				console.log(getObjects(trackingResponse, '#text', 'Out for Delivery'));
+				if (trackingResponse instanceof Array) {
+					console.log("JSON is   Arrrrrrrrrrrrrrray   yo!  ");
+				} else {
+					console.log("JSON is objjjjjjject   yo!  ");
 				}
 /*
 				$('['+trackingResponse+']').forEach(function(entry) {
