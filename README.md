@@ -77,7 +77,10 @@ BC Order Shipping Tracking
 - [jQuery find word in JSON object](http://stackoverflow.com/questions/7018990/jquery-find-word-in-json-object)
 - [Return multiple values in JavaScript?](http://stackoverflow.com/questions/2917175/return-multiple-values-in-javascript)
 - [Passing a callback function with included parameters?](http://stackoverflow.com/questions/14200021/passing-a-callback-function-with-included-parameters)
-- []()
+- [javascript Replace all ( and ) in s string](http://stackoverflow.com/questions/9115392/javascript-replace-all-and-in-s-string)
+- [Jquery filter not working with jquery object](http://stackoverflow.com/questions/17413742/jquery-filter-not-working-with-jquery-object)
+- [Javascript: How to filter object array based on attributes?](http://stackoverflow.com/questions/2722159/javascript-how-to-filter-object-array-based-on-attributes)
+- [How to find a JSON object member based on a string value](http://stackoverflow.com/questions/12029749/how-to-find-a-json-object-member-based-on-a-string-value)
 - []()
 - []()
 ###FedEx
