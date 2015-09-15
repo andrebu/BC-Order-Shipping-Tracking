@@ -10,7 +10,6 @@
 		height: 24px;
 		width: 100%;
 		background: #f2f2f2;
-		overflow: hidden;
 		margin: 8.5px 0;
 		min-height: 1em;
 		border-radius: 12px;
@@ -65,7 +64,7 @@
 		position: relative;
 		width: 100%;
 		display: block;
-		min-height: 1em;
+		min-height: 3em;
 		font-size: 13px;
 		font-weight: 700;
 	}
@@ -335,19 +334,19 @@
 	
 	function trackerLine(shipStatusIndex) {
 		//Tracker line Top
-		var trackerTop = '<div class="top"><span class="latest-event-status" data-position="0"></span></div>';
+		var trackerTop = '<div class="top"><span class="latest-event-status" style="display:none;"></span></div>';
 		//Tracker line Bottom
 		var orderDate = '%%GLOBAL_OrderDate%%';
 		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
 		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
 		orderShipped = true;
 		var shippedDate = (orderShipped ? 'A Date' : '');
-		var shippedStatus = ((shippedDate != '') ? '<span class="shipped-status" data-position=""><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
+		var shippedStatus = ((shippedDate != '') ? '<span style="display:none;" class="shipped-status"><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
 		orderDelivered = true;
 		var deliveryDate = (orderDelivered ? 'A Date' : '');
-		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
+		var deliveryStatus = ((deliveryDate != '') ? '<span style="display:none;" class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
 		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
-		var trackerLineHTML = '<div style="display:none;" class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
+		var trackerLineHTML = '<div class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
 							+ '</div><i class="dot latest-event-dot" data-position=""></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
@@ -358,13 +357,16 @@
 		console.log(shippingStatus[shipStatusIndex].dotPos.side);
 		console.log(shippingStatus[shipStatusIndex].dotPos.cord);
 		console.log(shippingStatus[shipStatusIndex].text);
-		var shipStatusPosish = $('.latest-event-dot, .latest-event-status');
 		var shipStatusLine = $('.latest-event-status');
+		var shipStatusDot = $('.latest-event-dot');
 		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
 		var shipStatusCord = shippingStatus[shipStatusIndex].dotPos.cord;
+		var newPosishCords = {[shipStatusSide]:shipStatusCord};
 		var shipStatusText = shippingStatus[shipStatusIndex].text;
-		shipStatusPosish.css(shipStatusSide, shipStatusCord);
-		shipStatusLine.html(shipStatusText);
+		shipStatusLine.css(shipStatusSide, shipStatusCord).html(shipStatusText);
+		shipStatusDot.animate(newPosishCords, '3000', function() {
+			shipStatusLine.fadeIn('1300');
+		});
 	}
 	
 	function getTrackingInfo(shippingTrackingNumber) {
@@ -391,6 +393,7 @@
 	var orderShipped = false;
 	var orderDelivered = false;
 	var shipStatusIndex = '2';
-	getTrackingInfo(trackingNumber);
-	
+	$(document).ready(function(){
+		getTrackingInfo(trackingNumber);
+	})
 </script>​​​​​​
