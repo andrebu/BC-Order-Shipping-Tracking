@@ -324,6 +324,38 @@
 				console.log(trackingStringNoCurls);
 				var alreadyAccepted = $(trackingStringNoCurls).find('Accepted');
 				console.log(alreadyAccepted);
+				var found;
+				var trueArray = Array.prototype.slice.call(trackingResponse, 0);
+					console.log("trueArray --- " + trueArray);
+				for(var value in obj) {
+					if(obj.hasOwnProperty(key)) {
+					
+					}
+				}
+/*
+				$('['+trackingResponse+']').forEach(function(entry) {
+					console.log('Hello?');
+					if (entry == "Accepted at USPS Origin Sort Facility") {
+						found = entry;
+						return true;
+					}
+					console.log("found --- " + found);
+				});
+*/
+/*
+				var a = array;
+				var index = 0;
+				var found;
+				var entry;
+				for (index = 0; index < a.length; ++index) {
+					entry = a[index];
+					if (entry.coupon_code == "COUPON1") {
+						found = entry;
+						break;
+					}
+				}
+*/
+
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
 					var acceptedDate = '';
