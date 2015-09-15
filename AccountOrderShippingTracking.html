@@ -215,8 +215,6 @@
 
 	function USPSTracking(shippingTrackingNumber, callback) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		//var USPSStatus = {}; //0ordered,1shipped,2delivered,variable
-		//var shipStatusIndex = 0; //0ordered,1shipped,2delivered,variable
 		var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
 		function getUSPSData(trackUrl, callback) {		
 			$.ajax({
@@ -233,7 +231,6 @@
 		}
 		
 		function createUSPSTable(xml) {
-					console.log(xml);
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
 	        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
@@ -322,10 +319,8 @@
 			function USPSStatus (trackingSumEvent){
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
-					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
 				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
 					shipStatusIndex = 1;
-					console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
 				} else {
 					shipStatusIndex = 0;
 				}
@@ -333,11 +328,7 @@
 			}
 			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
 		}
-		//console.log('USPSStatusUSPSStatusUSPSStatusUSPSStatusUSPSStatus!!!!!  ' + USPSStatus);
-		//var statCALL = function(){USPSStatus(trackingSumEvent)};
-		var ajaxCallback = function (xml) {
-			createUSPSTable(xml);
-		}
+		var ajaxCallback = function (xml) {createUSPSTable(xml);}
 		getUSPSData(USPSUrl, ajaxCallback);
 	}
 	
@@ -346,19 +337,12 @@
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
 							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
-		console.log(shipStatusIndex);
-		console.log(shippingStatus[shipStatusIndex]);
-		console.log(shippingStatus[shipStatusIndex].dotPos.side);
-		console.log(shippingStatus[shipStatusIndex].dotPos.cord);
-		console.log(shippingStatus[shipStatusIndex].text);
 		var shipStatusSpan = $('.latest-event-status');
 		var shipStatusDot = $('.latest-event-dot');
 		var shipProgressStatus = $('.package-status');
 		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
 		var shipStatusCord = shippingStatus[shipStatusIndex].dotPos.cord;
 		var newDotCords = {[shipStatusSide]:shipStatusCord};
-		console.log(newLineCords);
-		console.log(newDotCords);
 		var shipStatusText = shippingStatus[shipStatusIndex].text;
 		shipStatusSpan.html(shipStatusText);
 		shipStatusDot.attr('data-content', shipStatusText);
@@ -371,7 +355,6 @@
 				shipProgressStatus.animate(newLineCords, 3700)
 				shipStatusDot.animate(newDotCords, 3700, function() {
 					shipStatusSpan.add('.shipped-status').fadeIn('1300');
-					console.log('HELLOOOO!??!?!?!?'); //
 				});
 			})
 		} else if (shipStatusIndex == 2) {
