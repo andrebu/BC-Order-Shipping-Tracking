@@ -18,10 +18,11 @@
 		position: absolute;
 		top: -30px;
 		left: -50px;
-		width: 150px;
+		width: 200px;
 		font-size: 17px;
 		font-weight: bold;
 		font-style: initial;
+		text-align: center;
 		display: none;
 	}
 	#AccountOrder .tracker-container .tracker-line .package-status {
@@ -151,12 +152,6 @@
 		border: 0;
 		padding: 10px 20px;
 	}
-/*
-	#AccountOrder .tracking-table {
-	#AccountOrder .tracking-table {
-	#AccountOrder .tracking-table {
-	#AccountOrder .tracking-table {
-*/
 </style>
 <script type="text/javascript">
 	var pageEnd = $('#AccountOrder .BlockContent');
@@ -248,9 +243,10 @@
 	        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
 			var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
 /*
-			if (trackingSumEvent.hasOwnProperty('Delivered')) {
-				console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');
-			}
+	        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
+	        var trackingSumEventEventName = trackingSummary.Name["#text"];
+	        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
+	        console.log("Tracking Event Name:" + trackingSumEventEventName);
 */
 			function getObjects(obj, key, val) {
 				var objects = [];
@@ -264,6 +260,7 @@
 				}
 				return objects;
 			}				
+			//if (trackingSumEvent.hasOwnProperty('Delivered')) {console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');}
 			var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
 			if (shipmentDelivered) {
 				var summaryRowText = 'Your item was delivered at the front door or porch at '+trackingSumEventTime+' ';
@@ -272,12 +269,6 @@
 				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
 				tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
 			}
-/*
-	        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
-	        var trackingSumEventEventName = trackingSummary.Name["#text"];
-	        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
-	        console.log("Tracking Event Name:" + trackingSumEventEventName);
-*/
 			if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
 				var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
 				console.log("Guaranteed Delivery Date:" + guarDelDate);
@@ -317,14 +308,32 @@
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
 			function USPSStatus (trackingSumEvent){
+/*
+				var acceptedDate = function(){
+					if (trackingSumEvent.indexOf("Delivered") != -1) {
+						
+					}
+				};
+*/
+				var deliveredDate = function(){};
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
+					var acceptedDate = '';
+					var deliveredDate = trackingSummary.EventDate["#text"];
+					var splitDate = deliveredDate.split(" ").slice(0,2);
+					var formattedDate = splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
+					var deliveredAddress = '' + trackingSummary.EventCity["#text"] + ', ' + trackingSummary.EventState["#text"];
 				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
 					shipStatusIndex = 1;
 				} else {
 					shipStatusIndex = 0;
 				}
-				return shipStatusIndex;
+				return {
+					index: shipStatusIndex,
+					acceptedDate: acceptedDate,
+					deliveredDate: formattedDate,
+					deliveredAddress: deliveredAddress
+					};
 			}
 			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
 		}
@@ -333,37 +342,39 @@
 	}
 	
 	function animateTrackerLine(shipStatusIndex) {
+		console.log(shipStatusIndex);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
 							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
-		var shipStatusSpan = $('.latest-event-status');
-		var shipStatusDot = $('.latest-event-dot');
-		var shipProgressStatus = $('.package-status');
-		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
-		var shipStatusCord = shippingStatus[shipStatusIndex].dotPos.cord;
-		var newDotCords = {[shipStatusSide]:shipStatusCord};
-		var shipStatusText = shippingStatus[shipStatusIndex].text;
-		shipStatusSpan.html(shipStatusText);
-		shipStatusDot.attr('data-content', shipStatusText);
-		if (shipStatusIndex == 0) {
-			shipStatusSpan.css({'left':'0','width':'180px'}).fadeIn('1300');
-		} else if (shipStatusIndex == 1) {
-			var progressWidthCalc = parseInt((shipStatusCord.replace('%', ''))) + 4;
+		var progressStatus = $('.package-status');
+		var progressStatusSpan = $('.latest-event-status');
+		var progressStatusDot = $('.latest-event-dot');
+		var progressStatusSide = shippingStatus[shipStatusIndex.index].dotPos.side;
+		var progressStatusCord = shippingStatus[shipStatusIndex.index].dotPos.cord;
+		var newDotCords = {[progressStatusSide]:progressStatusCord};
+		var progressStatusText = shippingStatus[shipStatusIndex.index].text;
+		var shippEDStatusDate = $('shipped-date');
+		if (shipStatusIndex.index == 0) {
+			progressStatusSpan.css({'left':'0','width':'180px'}).fadeIn('1300');
+		} else if (shipStatusIndex.index == 1) {
+			var progressWidthCalc = parseInt((progressStatusCord.replace('%', ''))) + 4;
 			var newLineCords = {"width":""+progressWidthCalc+"%"};
+			shippEDStatusDate.html(shipStatusIndex.acceptedDate);
 			$(window).load(function(){
-				shipProgressStatus.animate(newLineCords, 3700)
-				shipStatusDot.animate(newDotCords, 3700, function() {
-					shipStatusSpan.add('.shipped-status').fadeIn('1300');
+				progressStatus.animate(newLineCords, 3700)
+				progressStatusDot.animate(newDotCords, 3700, function() {
+					progressStatusSpan.add('.shipped-status').fadeIn('1300');
 				});
 			})
-		} else if (shipStatusIndex == 2) {
+		} else if (shipStatusIndex.index == 2) {
+			progressStatusSpan.html(progressStatusText + ' ' + shipStatusIndex.deliveredDate);
 			var newLineCords = {"width":"100%"};
 			$(window).load(function(){
-				shipProgressStatus.animate(newLineCords, 3700)
+				progressStatus.animate(newLineCords, 3700)
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1700);
-				shipStatusDot.animate(newDotCords, 3700, function() {
-					shipStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
+				progressStatusDot.animate(newDotCords, 3700, function() {
+					progressStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
 				});
 			})
 		}
