@@ -18,11 +18,10 @@
 		position: absolute;
 		top: 0;
 		height: 100%;
-		width: 100%;
+		width: 24px;
 		max-width: 100%;
 		background: #008a00;
 		box-sizing: border-box;
-/* 		width: 0; */
 		border-radius: 12px;
     }
 	#AccountOrder .tracker-container .tracker-line .dot {
@@ -47,6 +46,18 @@
 		transform: translateX(0px) translateZ(0px);
 		left: auto;
 		right: 96.3%;
+	}
+	#AccountOrder .tracker-container .tracker-line .latest-event-dot:before {
+		content: attr(data-content);
+		display: block;
+		position: absolute;
+		top: -30px;
+		left: -50px;
+		width: 150px;
+		font-size: 17px;
+		font-weight: bold;
+		font-style: initial;
+		visibility: hidden;
 	}
 	#AccountOrder .tracker-container .top {
 		position: relative;
@@ -90,6 +101,7 @@
 		width: 51px;
 		left: 25%;
 		display: inline;
+		visibility: hidden;
     }
 	#AccountOrder .tracker-container .bottom .shipped-status .marker {
 		position: absolute;
@@ -337,6 +349,7 @@
 	function trackerLine(shipStatusIndex) {
 		//Tracker line Top
 		var trackerTop = '<div class="top"><span class="latest-event-status" style="display:none;"></span></div>';
+		var latestEventDesc = $('#AccountOrder .tracker-container .tracker-line .latest-event-dot');
 		//Tracker line Bottom
 		var orderDate = '%%GLOBAL_OrderDate%%';
 		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
@@ -354,7 +367,7 @@
 		pageEnd.append(trackerLineHTML);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
-							  {"dotPos":{"side":"left","cord":"25%"},"text":"It\’s on the way"},
+							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
 							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
 		console.log(shippingStatus[shipStatusIndex]);
 		console.log(shippingStatus[shipStatusIndex].dotPos.side);
@@ -362,18 +375,41 @@
 		console.log(shippingStatus[shipStatusIndex].text);
 		var shipStatusLine = $('.latest-event-status');
 		var shipStatusDot = $('.latest-event-dot');
+		var shipProgressStatus = $('.package-status');
 		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
 		var shipStatusCord = shippingStatus[shipStatusIndex].dotPos.cord;
-		var newPosishCords = {[shipStatusSide]:shipStatusCord};
+		var newDotCords = {[shipStatusSide]:shipStatusCord};
+		console.log(newLineCords);
+		console.log(newDotCords);
 		var shipStatusText = shippingStatus[shipStatusIndex].text;
 		shipStatusLine.css(shipStatusSide, shipStatusCord).html(shipStatusText);
-		$(window).load(function(){
-			shipStatusDot.animate(newPosishCords, 3700, function() {
-				shipStatusLine.fadeIn('1300');
-			});
-		})
+		shipStatusDot.attr('data-content', shipStatusText);
+		if (shipStatusIndex == 0) {
+			
+		} else if (shipStatusIndex == 1) {
+			var progressWidthCalc = parseInt((shipStatusCord.replace('%', ''))) + 4;
+			var newLineCords = {"width":""+progressWidthCalc+"%"};
+			$(window).load(function(){
+				shipProgressStatus.animate(newLineCords, 3700)
+				shipStatusDot.animate(newDotCords, 3700, function() {
+					//shipStatusLine.fadeIn('1300');
+					latestEventDesc.add('.shipped-status').fadeIn('1300');
+				});
+			})
+		} else if (shipStatusIndex == 2) {
+			var newLineCords = {"width":"100%"};
+			$(window).load(function(){
+				shipProgressStatus.animate(newLineCords, 3700)
+				shipStatusDot.animate(newDotCords, 3700, function() {
+					//shipStatusLine.fadeIn('1300');
+					latestEventDesc.fadeIn('1300');
+				});
+			})
+		}
 	}
-	
+	//if(json_object.hasOwnProperty('name')){
+		//do struff
+	//}
 	function getTrackingInfo(shippingTrackingNumber) {
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
@@ -397,7 +433,7 @@
 	console.log(shippingAddress);
 	var orderShipped = false;
 	var orderDelivered = false;
-	var shipStatusIndex = '2';
+	var shipStatusIndex = '1'; //0ordered,1shipped,2delivered,variable
 	$(document).ready(function(){
 		getTrackingInfo(trackingNumber);
 	});
