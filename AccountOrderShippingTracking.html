@@ -368,7 +368,9 @@
 		var progressStatusCord = shippingStatus[shipStatusIndex.index].dotPos.cord;
 		var newDotCords = {[progressStatusSide]:progressStatusCord};
 		var progressStatusText = shippingStatus[shipStatusIndex.index].text;
+		console.log("HUH????  ---- " + progressStatusText);
 		var shippEDStatusDate = $('shipped-date');
+		progressStatusSpan.html(progressStatusText);
 		if (shipStatusIndex.index == 0) {
 			progressStatusSpan.css({'left':'0','width':'180px'}).fadeIn('1300');
 		} else if (shipStatusIndex.index == 1) {
@@ -377,8 +379,9 @@
 			shippEDStatusDate.html(shipStatusIndex.acceptedDate);
 			$(window).load(function(){
 				progressStatus.animate(newLineCords, 3700)
+				setTimeout(function(){$('.shipped-status').fadeIn()}, 2800);
 				progressStatusDot.animate(newDotCords, 3700, function() {
-					progressStatusSpan.add('.shipped-status').fadeIn('1300');
+					progressStatusSpan.fadeIn('1300'); //.add('.shipped-status')
 				});
 			})
 		} else if (shipStatusIndex.index == 2) {
