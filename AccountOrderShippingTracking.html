@@ -165,7 +165,9 @@
 	console.log(shippingAddress);
 	var orderShipped = false;
 	var orderDelivered = false;
-	//var shipStatusIndex = ''; //0ordered,1shipped,2delivered,variable
+	var USPSStatus = {}; //0ordered,1shipped,2delivered,variable
+	console.log(USPSStatus);
+	//var shipStatusIndex = {}; //0ordered,1shipped,2delivered,variable
 	//console.log(shipStatusIndex);
 	$(document).ready(function(){
 		runTrackingWidget(trackingNumber);
@@ -178,6 +180,7 @@
 				USPSTracking(shippingTrackingNumber);
 			};
 */
+			//var trackCall = function(shipStatusIndex){trackerLine(shipStatusIndex)};
 			USPSTracking(shippingTrackingNumber, trackerLine);
 			//trackerLine(USPSTracking(shippingTrackingNumber));
 			//trackerLine(trackerLineCallback);
@@ -204,9 +207,10 @@
 		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 	}
 
-	function USPSTracking(shippingTrackingNumber, callbackTrackerLine) {
+	function USPSTracking(shippingTrackingNumber, callback) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		var shipStatusIndex = 0; //0ordered,1shipped,2delivered,variable
+		//var USPSStatus = {}; //0ordered,1shipped,2delivered,variable
+		//var shipStatusIndex = 0; //0ordered,1shipped,2delivered,variable
 		var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
 		function getUSPSData(trackUrl, callback) {		
 			$.ajax({
@@ -221,12 +225,8 @@
 				}
 			});
 		}
-		var ajaxCallback = function () {
-			createUSPSTable(USPSStatus);
-		}
-		getUSPSData(USPSUrl, ajaxCallback);
 		
-		function createUSPSTable(xml, statusCallback) {
+		function createUSPSTable(xml) {
 					console.log(xml);
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
@@ -313,22 +313,24 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-			statusCallback(trackingSumEvent);
 		}
-		function USPSStatus(trackingSumEvent){
+		function USPSStatus (trackingSumEvent){
 			if (trackingSumEvent.indexOf("Delivered") != -1) {
 				shipStatusIndex = 2;
 				console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
-				return shipStatusIndex;
 			} else if (trackingSumEvent.indexOf("Accepted") != -1) {
 				shipStatusIndex = 1;
 				console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
 			} else {
 				shipStatusIndex = 0;
 			}
-			console.log("USPSStatusUSPSStatusUSPSStatusUSPSStatus ------------      -- -- -- -- - -   "+shipStatusIndex);
-			return shipStatusIndex;
 		}
+		//console.log('USPSStatusUSPSStatusUSPSStatusUSPSStatusUSPSStatus!!!!!  ' + USPSStatus);
+		//var statCALL = function(){USPSStatus(trackingSumEvent)};
+		var ajaxCallback = function (xml) {
+			createUSPSTable(xml);
+		}
+		getUSPSData(USPSUrl, ajaxCallback);
 	}
 	
 	function trackerLine(shipStatusIndex) {
@@ -426,5 +428,6 @@
 			}
 		}
 		return obj;
+	console.log(')(*+)(*+)(*+)(*+_)*+_)' + USPSStatus);
 	};
 </script>​​​​​​
