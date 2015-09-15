@@ -173,6 +173,7 @@
 		runTrackingWidget(trackingNumber);
 	});
 	function runTrackingWidget(shippingTrackingNumber) {
+		createTrackerLine();
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
 /*
@@ -181,7 +182,7 @@
 			};
 */
 			//var trackCall = function(shipStatusIndex){trackerLine(shipStatusIndex)};
-			USPSTracking(shippingTrackingNumber, trackerLine);
+			USPSTracking(shippingTrackingNumber, animateTrackerLine);
 			//trackerLine(USPSTracking(shippingTrackingNumber));
 			//trackerLine(trackerLineCallback);
 			//trackerLine(2);
@@ -195,6 +196,24 @@
 			//trackerLine();
 			//FedExTracking(shippingTrackingNumber);
 		}
+	}
+	function createTrackerLine() {
+		//Tracker line Bottom
+		var orderDate = '%%GLOBAL_OrderDate%%';
+		var orderDayMonthSliced = orderDate.split(" ").slice(0,2);
+		var orderDayMonth = '' + orderDayMonthSliced[1] + ' ' + orderDayMonthSliced[0].replace(/\D/g,'') + '';
+		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
+		orderShipped = true;
+		var shippedDate = (orderShipped ? 'A Date' : '');
+		var shippedStatus = ((shippedDate != '') ? '<span class="shipped-status"><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
+		orderDelivered = true;
+		var deliveryDate = (orderDelivered ? 'A Date' : '');
+		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
+		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
+		var trackerDots = '<i class="dot latest-event-dot"><span class="latest-event-status"></span></i><i class="dot delivery-dot"></i>';
+		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
+		var trackerLineHTML = '<div class="tracker-container">'+trackerLine+trackerBottom+'</div>';
+		pageEnd.append(trackerLineHTML);
 	}
 
 	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
@@ -313,17 +332,19 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-		}
-		function USPSStatus (trackingSumEvent){
-			if (trackingSumEvent.indexOf("Delivered") != -1) {
-				shipStatusIndex = 2;
-				console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
-			} else if (trackingSumEvent.indexOf("Accepted") != -1) {
-				shipStatusIndex = 1;
-				console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
-			} else {
-				shipStatusIndex = 0;
+			function USPSStatus (trackingSumEvent){
+				if (trackingSumEvent.indexOf("Delivered") != -1) {
+					shipStatusIndex = 2;
+					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
+				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
+					shipStatusIndex = 1;
+					console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
+				} else {
+					shipStatusIndex = 0;
+				}
+				return shipStatusIndex;
 			}
+			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
 		}
 		//console.log('USPSStatusUSPSStatusUSPSStatusUSPSStatusUSPSStatus!!!!!  ' + USPSStatus);
 		//var statCALL = function(){USPSStatus(trackingSumEvent)};
@@ -333,23 +354,7 @@
 		getUSPSData(USPSUrl, ajaxCallback);
 	}
 	
-	function trackerLine(shipStatusIndex) {
-		//Tracker line Bottom
-		var orderDate = '%%GLOBAL_OrderDate%%';
-		var orderDayMonthSliced = orderDate.split(" ").slice(0,2);
-		var orderDayMonth = '' + orderDayMonthSliced[1] + ' ' + orderDayMonthSliced[0].replace(/\D/g,'') + '';
-		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
-		orderShipped = true;
-		var shippedDate = (orderShipped ? 'A Date' : '');
-		var shippedStatus = ((shippedDate != '') ? '<span class="shipped-status"><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
-		orderDelivered = true;
-		var deliveryDate = (orderDelivered ? 'A Date' : '');
-		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
-		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
-		var trackerDots = '<i class="dot latest-event-dot"><span class="latest-event-status"></span></i><i class="dot delivery-dot"></i>';
-		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
-		var trackerLineHTML = '<div class="tracker-container">'+trackerLine+trackerBottom+'</div>';
-		pageEnd.append(trackerLineHTML);
+	function animateTrackerLine(shipStatusIndex) {
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
