@@ -45,6 +45,8 @@
 		opacity: 1;
 		display: inline;
 		transform: translateX(0px) translateZ(0px);
+		left: auto;
+		right: 96.3%;
 	}
 	#AccountOrder .tracker-container .top {
 		position: relative;
@@ -341,13 +343,14 @@
 		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
 		orderShipped = true;
 		var shippedDate = (orderShipped ? 'A Date' : '');
-		var shippedStatus = ((shippedDate != '') ? '<span style="display:none;" class="shipped-status"><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
+		var shippedStatus = ((shippedDate != '') ? '<span class="shipped-status"><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
 		orderDelivered = true;
 		var deliveryDate = (orderDelivered ? 'A Date' : '');
 		var deliveryStatus = ((deliveryDate != '') ? '<span style="display:none;" class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
 		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
-		var trackerLineHTML = '<div class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
-							+ '</div><i class="dot latest-event-dot" data-position=""></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
+		var trackerDots = '<i class="dot latest-event-dot"></i><i class="dot delivery-dot"></i>';
+		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
+		var trackerLineHTML = '<div class="tracker-container">'+trackerTop+trackerLine+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
@@ -364,7 +367,7 @@
 		var newPosishCords = {[shipStatusSide]:shipStatusCord};
 		var shipStatusText = shippingStatus[shipStatusIndex].text;
 		shipStatusLine.css(shipStatusSide, shipStatusCord).html(shipStatusText);
-		shipStatusDot.animate(newPosishCords, '3000', function() {
+		shipStatusDot.animate(newPosishCords, 3700, function() {
 			shipStatusLine.fadeIn('1300');
 		});
 	}
@@ -393,7 +396,7 @@
 	var orderShipped = false;
 	var orderDelivered = false;
 	var shipStatusIndex = '2';
-	$(document).ready(function(){
+	$(window).load(function(){
 		getTrackingInfo(trackingNumber);
 	})
 </script>​​​​​​
