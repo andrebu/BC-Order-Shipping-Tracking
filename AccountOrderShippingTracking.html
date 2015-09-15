@@ -159,9 +159,6 @@
 */
 </style>
 <script type="text/javascript">
-	//if(json_object.hasOwnProperty('name')){
-		//do struff
-	//}
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
 	var shippingAddress = $('.ShippingDetails').text();
@@ -176,8 +173,8 @@
 	function getTrackingInfo(shippingTrackingNumber) {
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
-			//trackerLine(USPSTracking(shippingTrackingNumber));
-			trackerLine("2");
+			trackerLine(USPSTracking(shippingTrackingNumber));
+			//trackerLine(2);
 		} else if (shippingTrackingNumber.length == 18) {
 			makeTrackingLink("FedEx", shippingTrackingNumber);
 			//trackerLine();
@@ -202,137 +199,123 @@
 
 	function USPSTracking(shippingTrackingNumber) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		var shipStatusIndex = ''; //0ordered,1shipped,2delivered,variable
-		$.ajax({
-			url: httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>',
-			type: "post",
-			success: function(xml){
-		        var trackingJSON = xmlToJson(xml);
-		        var trackingString = JSON.stringify(xmlToJson(xml));
-		        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
-		        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
-		        var trackingSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
-		        var trackingSumEventTime = trackingSummary.EventTime["#text"];
-		        var trackingSumEventDate = trackingSummary.EventDate["#text"];
-		        var trackingSumEvent = trackingSummary.Event["#text"];
-		        var trackingSumEventCity = trackingSummary.EventCity["#text"];
-		        var trackingSumEventState = trackingSummary.EventState["#text"];
-		        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"];
-		        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"];
-		        var sumDateTimeCol = '<td>' + trackingSumEventDate + ', ' + trackingSumEventTime + '</td>';
-		        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
-		        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
-				var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
+		var shipStatusIndex = 0; //0ordered,1shipped,2delivered,variable
+		function getUSPSData(callback) {		
+			var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+			$.ajax({
+				url: USPSUrl,
+				type: "post",
+				success: callback,
+				error: function(xhr, textStatus, errorThrown){
+			        console.log("Error? --- " + xhr.responseText);
+				}
+			});
+		}
+		getUSPSData(createUSPSTable);
+		
+		function createUSPSTable(xml) {
+	        var trackingJSON = xmlToJson(xml);
+	        var trackingString = JSON.stringify(xmlToJson(xml));
+	        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
+	        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
+	        var trackingSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
+	        var trackingSumEventTime = trackingSummary.EventTime["#text"];
+	        var trackingSumEventDate = trackingSummary.EventDate["#text"];
+	        var trackingSumEvent = trackingSummary.Event["#text"];
+	        var trackingSumEventCity = trackingSummary.EventCity["#text"];
+	        var trackingSumEventState = trackingSummary.EventState["#text"];
+	        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"];
+	        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"];
+	        var sumDateTimeCol = '<td>' + trackingSumEventDate + ', ' + trackingSumEventTime + '</td>';
+	        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
+	        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
+			var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
 /*
-				if (trackingSumEvent.hasOwnProperty('Delivered')) {
-					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');
-				}
-*/
-				function getObjects(obj, key, val) {
-					var objects = [];
-					for (var i in obj) {
-						if (!obj.hasOwnProperty(i)) continue;
-						if (typeof obj[i] == 'object') {
-							objects = objects.concat(getObjects(obj[i], key, val));
-						} else if (i == key && obj[key] == val) {
-							objects.push(obj);
-						}
-					}
-					return objects;
-				}				
-				var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
-				if (shipmentDelivered) {
-					var summaryRowText = 'Your item was delivered at the front door or porch at '+trackingSumEventTime+' ';
-					summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
-					summaryRowText += ''+trackingSumEventEventZIPCode+'';
-					tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
-					tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
-				}
-/*
-		        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
-		        var trackingSumEventEventName = trackingSummary.Name["#text"];
-*/
-		        console.log(trackingJSON);
-		        console.log("Full JSON:" + trackingString);
-		        console.log("Tracking ID:" + trackingID);
-				if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
-					var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
-					console.log("Guaranteed Delivery Date:" + guarDelDate);
-				}
-				console.log('TRACKING SUMMARY:');
-				console.log('========================================');
-		        console.log("Tracking Event Time:" + trackingSumEventTime);
-		        console.log("Tracking Event Date:" + trackingSumEventDate);
-		        console.log("Tracking Event City:" + trackingSumEventCity);
-		        console.log("Tracking Event State:" + trackingSumEventState);
-		        console.log("Tracking Event ZIP Code:" + trackingSumEventEventZIPCode);
-		        console.log("Tracking Event Country:" + trackingSumEventEventCountry);
-/*
-		        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
-		        console.log("Tracking Event Name:" + trackingSumEventEventName);
-*/
-				console.log('========================================');
-				console.log('/////   END OF TRACKING SUMMARY:');
-		        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail;
-				console.log('========================================');
-				console.log('========================================');
-				console.log('========================================');
-				console.log('TRACKING DETAILS:');
-				console.log('========================================');
-		        console.log('Tracking Details JSON:' + trackingDetails);
-				var odd_even = true;
-				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
-					console.log('Tracking Step: ' + trackingStepID);
-					console.log(TrackingStepDetails);
-					$.each(TrackingStepDetails, function( index, value ) {
-						//console.log( index + ": " + value["#text"] );
-					});
-			        var detailEventDate = TrackingStepDetails.EventDate["#text"];
-			        var detailEventTime = TrackingStepDetails.EventTime["#text"];
-			        var detailEvent = TrackingStepDetails.Event["#text"];
-			        var detailEventCity = TrackingStepDetails.EventCity["#text"];
-			        var detailEventState = TrackingStepDetails.EventState["#text"];
-			        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
-					if (typeof detailEventTime !== 'undefined') {
-						var dateTimeCol = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
-					} else {
-						var dateTimeCol = '<td>' + detailEventDate + '</td>';
-					}
-					var statusCol = '<td>' + detailEvent + '</td>';
-					if (typeof detailEventCity !== 'undefined') {
-						var locCol = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
-					} else {
-						var locCol = '<td></td>';
-					}
-			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
-			        odd_even = !odd_even;               
-				});
-				var tableHead = '<thead><tr class="tbl-head">' +
-								'<th scope="col" class="tbl-date-time">' +
-									'<div class="thpad">Date &amp; Time</div></th>' +
-								'<th scope="col" class="tbl-status">' +
-									'<div class="thpad">Status of Item</div></th>' +
-								'<th scope="col" class="tbl-location">' +
-								'<div class="thpad">Location</div></th>' +
-							'</tr></thead>';
-				var tableBody = '<tbody>' + tableRows + '</tbody>';
-				var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
-				pageEnd.append(trackingTable);
-				if (trackingSumEvent.indexOf("Delivered") != -1) {
-					shipStatusIndex = '2';
-					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
-				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
-					shipStatusIndex = '1';
-					console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
-				} else {
-					shipStatusIndex = '0';
-				}
-			},
-			error: function(xhr, textStatus, errorThrown){
-		        console.log("Error? --- " + xhr.responseText);
+			if (trackingSumEvent.hasOwnProperty('Delivered')) {
+				console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');
 			}
-		});
+*/
+			function getObjects(obj, key, val) {
+				var objects = [];
+				for (var i in obj) {
+					if (!obj.hasOwnProperty(i)) continue;
+					if (typeof obj[i] == 'object') {
+						objects = objects.concat(getObjects(obj[i], key, val));
+					} else if (i == key && obj[key] == val) {
+						objects.push(obj);
+					}
+				}
+				return objects;
+			}				
+			var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
+			if (shipmentDelivered) {
+				var summaryRowText = 'Your item was delivered at the front door or porch at '+trackingSumEventTime+' ';
+				summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
+				summaryRowText += ''+trackingSumEventEventZIPCode+'';
+				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
+				tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
+			}
+/*
+	        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
+	        var trackingSumEventEventName = trackingSummary.Name["#text"];
+	        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
+	        console.log("Tracking Event Name:" + trackingSumEventEventName);
+*/
+			if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
+				var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
+				console.log("Guaranteed Delivery Date:" + guarDelDate);
+			}
+	        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail;
+			var odd_even = true;
+			$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
+		        var detailEventDate = TrackingStepDetails.EventDate["#text"];
+		        var detailEventTime = TrackingStepDetails.EventTime["#text"];
+		        var detailEvent = TrackingStepDetails.Event["#text"];
+		        var detailEventCity = TrackingStepDetails.EventCity["#text"];
+		        var detailEventState = TrackingStepDetails.EventState["#text"];
+		        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
+				if (typeof detailEventTime !== 'undefined') {
+					var dateTimeCol = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+				} else {
+					var dateTimeCol = '<td>' + detailEventDate + '</td>';
+				}
+				var statusCol = '<td>' + detailEvent + '</td>';
+				if (typeof detailEventCity !== 'undefined') {
+					var locCol = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+				} else {
+					var locCol = '<td></td>';
+				}
+		        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
+		        odd_even = !odd_even;               
+			});
+			var tableHead = '<thead><tr class="tbl-head">' +
+							'<th scope="col" class="tbl-date-time">' +
+								'<div class="thpad">Date &amp; Time</div></th>' +
+							'<th scope="col" class="tbl-status">' +
+								'<div class="thpad">Status of Item</div></th>' +
+							'<th scope="col" class="tbl-location">' +
+							'<div class="thpad">Location</div></th>' +
+						'</tr></thead>';
+			var tableBody = '<tbody>' + tableRows + '</tbody>';
+			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
+			pageEnd.append(trackingTable);
+			return trackingSumEvent;
+		}
+		function USPSStatus(trackingSumEvent){
+			if (trackingSumEvent.indexOf("Delivered") != -1) {
+				shipStatusIndex = 2;
+				console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
+				return shipStatusIndex;
+			} else if (trackingSumEvent.indexOf("Accepted") != -1) {
+				shipStatusIndex = 1;
+				console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
+			} else {
+				shipStatusIndex = 0;
+			}
+			return shipStatusIndex;
+		}
 		return shipStatusIndex;
+		console.log("USPSStatusUSPSStatusUSPSStatusUSPSStatus"+shipStatusIndex);
 	}
 	
 	function trackerLine(shipStatusIndex) {
@@ -380,7 +363,6 @@
 			$(window).load(function(){
 				shipProgressStatus.animate(newLineCords, 3700)
 				shipStatusDot.animate(newDotCords, 3700, function() {
-					//shipStatusSpan.fadeIn('1300');
 					shipStatusSpan.add('.shipped-status').fadeIn('1300');
 					console.log('HELLOOOO!??!?!?!?'); //
 				});
@@ -391,7 +373,6 @@
 				shipProgressStatus.animate(newLineCords, 3700)
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1700);
 				shipStatusDot.animate(newDotCords, 3700, function() {
-					//shipStatusSpan.fadeIn('1300');
 					shipStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
 				});
 			})
