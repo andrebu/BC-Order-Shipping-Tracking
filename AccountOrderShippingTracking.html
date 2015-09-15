@@ -168,12 +168,19 @@
 	//var shipStatusIndex = ''; //0ordered,1shipped,2delivered,variable
 	//console.log(shipStatusIndex);
 	$(document).ready(function(){
-		getTrackingInfo(trackingNumber);
+		runTrackingWidget(trackingNumber);
 	});
-	function getTrackingInfo(shippingTrackingNumber) {
+	function runTrackingWidget(shippingTrackingNumber) {
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
-			trackerLine(USPSTracking(shippingTrackingNumber));
+/*
+			var trackerLineCallback = function(){
+				USPSTracking(shippingTrackingNumber);
+			};
+*/
+			USPSTracking(shippingTrackingNumber, trackerLine);
+			//trackerLine(USPSTracking(shippingTrackingNumber));
+			//trackerLine(trackerLineCallback);
 			//trackerLine(2);
 		} else if (shippingTrackingNumber.length == 18) {
 			makeTrackingLink("FedEx", shippingTrackingNumber);
@@ -197,23 +204,30 @@
 		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 	}
 
-	function USPSTracking(shippingTrackingNumber) {
+	function USPSTracking(shippingTrackingNumber, callbackTrackerLine) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
 		var shipStatusIndex = 0; //0ordered,1shipped,2delivered,variable
-		function getUSPSData(callback) {		
-			var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+		var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+		function getUSPSData(trackUrl, callback) {		
 			$.ajax({
-				url: USPSUrl,
+				url: trackUrl,
 				type: "post",
-				success: callback,
+				success: function(xml){
+					console.log(xml);
+					callback(xml);
+				},
 				error: function(xhr, textStatus, errorThrown){
 			        console.log("Error? --- " + xhr.responseText);
 				}
 			});
 		}
-		getUSPSData(createUSPSTable);
+		var ajaxCallback = function () {
+			createUSPSTable(USPSStatus);
+		}
+		getUSPSData(USPSUrl, ajaxCallback);
 		
-		function createUSPSTable(xml) {
+		function createUSPSTable(xml, statusCallback) {
+					console.log(xml);
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
 	        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
@@ -299,7 +313,7 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-			return trackingSumEvent;
+			statusCallback(trackingSumEvent);
 		}
 		function USPSStatus(trackingSumEvent){
 			if (trackingSumEvent.indexOf("Delivered") != -1) {
@@ -312,10 +326,9 @@
 			} else {
 				shipStatusIndex = 0;
 			}
+			console.log("USPSStatusUSPSStatusUSPSStatusUSPSStatus ------------      -- -- -- -- - -   "+shipStatusIndex);
 			return shipStatusIndex;
 		}
-		return shipStatusIndex;
-		console.log("USPSStatusUSPSStatusUSPSStatusUSPSStatus"+shipStatusIndex);
 	}
 	
 	function trackerLine(shipStatusIndex) {
