@@ -14,6 +14,23 @@
 		min-height: 1em;
 		border-radius: 12px;
 	}
+	#AccountOrder .tracker-container .latest-event-status {
+/*
+		position: absolute;
+		bottom: 0;
+		font-weight: 700;
+		display: inline;
+		opacity: 1;
+*/
+		position: absolute;
+		top: -30px;
+		left: -50px;
+		width: 150px;
+		font-size: 17px;
+		font-weight: bold;
+		font-style: initial;
+		display: none;
+	}
 	#AccountOrder .tracker-container .tracker-line .package-status {
 		position: absolute;
 		top: 0;
@@ -47,32 +64,6 @@
 		left: auto;
 		right: 96.3%;
 	}
-	#AccountOrder .tracker-container .tracker-line .latest-event-dot:before {
-		content: attr(data-content);
-		display: block;
-		position: absolute;
-		top: -30px;
-		left: -50px;
-		width: 150px;
-		font-size: 17px;
-		font-weight: bold;
-		font-style: initial;
-		visibility: hidden;
-	}
-	#AccountOrder .tracker-container .top {
-		position: relative;
-		width: 100%;
-		display: block;
-		min-height: 1em;
-		font-size: 17px;
-	}
-	#AccountOrder .tracker-container .top .latest-event-status {
-		position: absolute;
-		bottom: 0;
-		font-weight: 700;
-		display: inline;
-		opacity: 1;
-	}
 	#AccountOrder .tracker-container .bottom { 
 		position: relative;
 		width: 100%;
@@ -101,7 +92,7 @@
 		width: 51px;
 		left: 25%;
 		display: inline;
-		visibility: hidden;
+		display: none;
     }
 	#AccountOrder .tracker-container .bottom .shipped-status .marker {
 		position: absolute;
@@ -347,9 +338,6 @@
 	}
 	
 	function trackerLine(shipStatusIndex) {
-		//Tracker line Top
-		var trackerTop = '<div class="top"><span class="latest-event-status" style="display:none;"></span></div>';
-		var latestEventDesc = $('#AccountOrder .tracker-container .tracker-line .latest-event-dot');
 		//Tracker line Bottom
 		var orderDate = '%%GLOBAL_OrderDate%%';
 		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
@@ -361,9 +349,9 @@
 		var deliveryDate = (orderDelivered ? 'A Date' : '');
 		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
 		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
-		var trackerDots = '<i class="dot latest-event-dot"></i><i class="dot delivery-dot"></i>';
+		var trackerDots = '<i class="dot latest-event-dot"><span class="latest-event-status"></span></i><i class="dot delivery-dot"></i>';
 		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
-		var trackerLineHTML = '<div class="tracker-container">'+trackerTop+trackerLine+trackerBottom+'</div>';
+		var trackerLineHTML = '<div class="tracker-container">'+trackerLine+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
@@ -373,7 +361,7 @@
 		console.log(shippingStatus[shipStatusIndex].dotPos.side);
 		console.log(shippingStatus[shipStatusIndex].dotPos.cord);
 		console.log(shippingStatus[shipStatusIndex].text);
-		var shipStatusLine = $('.latest-event-status');
+		var shipStatusSpan = $('.latest-event-status');
 		var shipStatusDot = $('.latest-event-dot');
 		var shipProgressStatus = $('.package-status');
 		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
@@ -382,7 +370,7 @@
 		console.log(newLineCords);
 		console.log(newDotCords);
 		var shipStatusText = shippingStatus[shipStatusIndex].text;
-		shipStatusLine.css(shipStatusSide, shipStatusCord).html(shipStatusText);
+		shipStatusSpan.html(shipStatusText);
 		shipStatusDot.attr('data-content', shipStatusText);
 		if (shipStatusIndex == 0) {
 			
@@ -392,8 +380,9 @@
 			$(window).load(function(){
 				shipProgressStatus.animate(newLineCords, 3700)
 				shipStatusDot.animate(newDotCords, 3700, function() {
-					//shipStatusLine.fadeIn('1300');
-					latestEventDesc.add('.shipped-status').fadeIn('1300');
+					//shipStatusSpan.fadeIn('1300');
+					shipStatusSpan.add('.shipped-status').fadeIn('1300');
+					console.log('HELLOOOO!??!?!?!?'); //
 				});
 			})
 		} else if (shipStatusIndex == 2) {
@@ -401,8 +390,8 @@
 			$(window).load(function(){
 				shipProgressStatus.animate(newLineCords, 3700)
 				shipStatusDot.animate(newDotCords, 3700, function() {
-					//shipStatusLine.fadeIn('1300');
-					latestEventDesc.fadeIn('1300');
+					//shipStatusSpan.fadeIn('1300');
+					shipStatusSpan.fadeIn('1300');
 				});
 			})
 		}
