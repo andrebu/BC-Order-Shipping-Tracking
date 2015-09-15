@@ -15,13 +15,6 @@
 		border-radius: 12px;
 	}
 	#AccountOrder .tracker-container .latest-event-status {
-/*
-		position: absolute;
-		bottom: 0;
-		font-weight: 700;
-		display: inline;
-		opacity: 1;
-*/
 		position: absolute;
 		top: -30px;
 		left: -50px;
@@ -91,7 +84,6 @@
 	#AccountOrder .tracker-container .bottom .shipped-status {
 		width: 51px;
 		left: 25%;
-		display: inline;
 		display: none;
     }
 	#AccountOrder .tracker-container .bottom .shipped-status .marker {
@@ -167,6 +159,37 @@
 */
 </style>
 <script type="text/javascript">
+	//if(json_object.hasOwnProperty('name')){
+		//do struff
+	//}
+	var pageEnd = $('#AccountOrder .BlockContent');
+	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
+	var shippingAddress = $('.ShippingDetails').text();
+	console.log(shippingAddress);
+	var orderShipped = false;
+	var orderDelivered = false;
+	//var shipStatusIndex = ''; //0ordered,1shipped,2delivered,variable
+	//console.log(shipStatusIndex);
+	$(document).ready(function(){
+		getTrackingInfo(trackingNumber);
+	});
+	function getTrackingInfo(shippingTrackingNumber) {
+		if (shippingTrackingNumber.length == 22) {
+			makeTrackingLink("USPS", shippingTrackingNumber);
+			//trackerLine(USPSTracking(shippingTrackingNumber));
+			trackerLine("2");
+		} else if (shippingTrackingNumber.length == 18) {
+			makeTrackingLink("FedEx", shippingTrackingNumber);
+			//trackerLine();
+			//FedExTracking(shippingTrackingNumber);
+		} else if ((shippingTrackingNumber.length == 12) && (shippingTrackingNumber.length == 14)) {
+			//starts with 1Z
+			makeTrackingLink("UPS", shippingTrackingNumber);
+			//trackerLine();
+			//FedExTracking(shippingTrackingNumber);
+		}
+	}
+
 	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
 	function makeTrackingLink(carrierCompany, shippingTrackingNumber) {
 		var anchorLink = {'USPS':'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=',
@@ -177,44 +200,9 @@
 		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 	}
 
-	// Changes XML to JSON
-	function xmlToJson(xml) {
-		// Create the return object
-		var obj = {};
-		if (xml.nodeType == 1) { // element
-			// do attributes
-			if (xml.attributes.length > 0) {
-			obj["@attributes"] = {};
-				for (var j = 0; j < xml.attributes.length; j++) {
-					var attribute = xml.attributes.item(j);
-					obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
-				}
-			}
-		} else if (xml.nodeType == 3) { // text
-			obj = xml.nodeValue;
-		}
-		// do children
-		if (xml.hasChildNodes()) {
-			for(var i = 0; i < xml.childNodes.length; i++) {
-				var item = xml.childNodes.item(i);
-				var nodeName = item.nodeName;
-				if (typeof(obj[nodeName]) == "undefined") {
-					obj[nodeName] = xmlToJson(item);
-				} else {
-					if (typeof(obj[nodeName].push) == "undefined") {
-						var old = obj[nodeName];
-						obj[nodeName] = [];
-						obj[nodeName].push(old);
-					}
-					obj[nodeName].push(xmlToJson(item));
-				}
-			}
-		}
-		return obj;
-	};
-
 	function USPSTracking(shippingTrackingNumber) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+		var shipStatusIndex = ''; //0ordered,1shipped,2delivered,variable
 		$.ajax({
 			url: httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>',
 			type: "post",
@@ -328,19 +316,30 @@
 								'<div class="thpad">Location</div></th>' +
 							'</tr></thead>';
 				var tableBody = '<tbody>' + tableRows + '</tbody>';
-				var trackingTable = '<table class="USPS-table tracking-table" style="display:none;">' +  tableHead + tableBody + '</table>';
+				var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 				pageEnd.append(trackingTable);
+				if (trackingSumEvent.indexOf("Delivered") != -1) {
+					shipStatusIndex = '2';
+					console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!  ' + shipStatusIndex);
+				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
+					shipStatusIndex = '1';
+					console.log('ACCEPTEDDDDD!!!!!!!!!  ' + shipStatusIndex);
+				} else {
+					shipStatusIndex = '0';
+				}
 			},
 			error: function(xhr, textStatus, errorThrown){
 		        console.log("Error? --- " + xhr.responseText);
 			}
 		});
+		return shipStatusIndex;
 	}
 	
 	function trackerLine(shipStatusIndex) {
 		//Tracker line Bottom
 		var orderDate = '%%GLOBAL_OrderDate%%';
-		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
+		var orderDayMonthSliced = orderDate.split(" ").slice(0,2);
+		var orderDayMonth = '' + orderDayMonthSliced[1] + ' ' + orderDayMonthSliced[0].replace(/\D/g,'') + '';
 		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
 		orderShipped = true;
 		var shippedDate = (orderShipped ? 'A Date' : '');
@@ -357,6 +356,7 @@
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
 							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
+		console.log(shipStatusIndex);
 		console.log(shippingStatus[shipStatusIndex]);
 		console.log(shippingStatus[shipStatusIndex].dotPos.side);
 		console.log(shippingStatus[shipStatusIndex].dotPos.cord);
@@ -373,7 +373,7 @@
 		shipStatusSpan.html(shipStatusText);
 		shipStatusDot.attr('data-content', shipStatusText);
 		if (shipStatusIndex == 0) {
-			
+			shipStatusSpan.css({'left':'0','width':'180px'}).fadeIn('1300');
 		} else if (shipStatusIndex == 1) {
 			var progressWidthCalc = parseInt((shipStatusCord.replace('%', ''))) + 4;
 			var newLineCords = {"width":""+progressWidthCalc+"%"};
@@ -389,41 +389,48 @@
 			var newLineCords = {"width":"100%"};
 			$(window).load(function(){
 				shipProgressStatus.animate(newLineCords, 3700)
+				setTimeout(function(){$('.shipped-status').fadeIn()}, 1700);
 				shipStatusDot.animate(newDotCords, 3700, function() {
 					//shipStatusSpan.fadeIn('1300');
-					shipStatusSpan.fadeIn('1300');
+					shipStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
 				});
 			})
 		}
 	}
-	//if(json_object.hasOwnProperty('name')){
-		//do struff
-	//}
-	function getTrackingInfo(shippingTrackingNumber) {
-		if (shippingTrackingNumber.length == 22) {
-			makeTrackingLink("USPS", shippingTrackingNumber);
-			trackerLine(shipStatusIndex);
-			USPSTracking(shippingTrackingNumber);
-		} else if (shippingTrackingNumber.length == 18) {
-			makeTrackingLink("FedEx", shippingTrackingNumber);
-			//trackerLine();
-			//FedExTracking(shippingTrackingNumber);
-		} else if ((shippingTrackingNumber.length == 12) && (shippingTrackingNumber.length == 14)) {
-			//starts with 1Z
-			makeTrackingLink("UPS", shippingTrackingNumber);
-			//trackerLine();
-			//FedExTracking(shippingTrackingNumber);
-		}
-	}
 
-	var pageEnd = $('#AccountOrder .BlockContent');
-	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-	var shippingAddress = $('.ShippingDetails').text();
-	console.log(shippingAddress);
-	var orderShipped = false;
-	var orderDelivered = false;
-	var shipStatusIndex = '1'; //0ordered,1shipped,2delivered,variable
-	$(document).ready(function(){
-		getTrackingInfo(trackingNumber);
-	});
+	// Changes XML to JSON
+	function xmlToJson(xml) {
+		// Create the return object
+		var obj = {};
+		if (xml.nodeType == 1) { // element
+			// do attributes
+			if (xml.attributes.length > 0) {
+			obj["@attributes"] = {};
+				for (var j = 0; j < xml.attributes.length; j++) {
+					var attribute = xml.attributes.item(j);
+					obj["@attributes"][attribute.nodeName] = attribute.nodeValue;
+				}
+			}
+		} else if (xml.nodeType == 3) { // text
+			obj = xml.nodeValue;
+		}
+		// do children
+		if (xml.hasChildNodes()) {
+			for(var i = 0; i < xml.childNodes.length; i++) {
+				var item = xml.childNodes.item(i);
+				var nodeName = item.nodeName;
+				if (typeof(obj[nodeName]) == "undefined") {
+					obj[nodeName] = xmlToJson(item);
+				} else {
+					if (typeof(obj[nodeName].push) == "undefined") {
+						var old = obj[nodeName];
+						obj[nodeName] = [];
+						obj[nodeName].push(old);
+					}
+					obj[nodeName].push(xmlToJson(item));
+				}
+			}
+		}
+		return obj;
+	};
 </script>​​​​​​
