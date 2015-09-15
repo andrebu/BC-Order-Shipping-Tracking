@@ -210,13 +210,16 @@
 
 	function USPSTracking(shippingTrackingNumber, callback) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		var USPSUrl = httpPrefix + '//cors-anywhere.herokuapp.com/' + '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="689DSSHI5238"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+		var corsAnyUrl = '//cors-anywhere.herokuapp.com/';
+		var USPSId = '689DSSHI5238';
+		var USPSUrl1 = '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="';
+		var USPSUrl2 = '"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+		var USPSUrl = httpPrefix + corsAnyUrl + USPSUrl1 + USPSId + USPSUrl2;
 		function getUSPSData(trackUrl, callback) {		
 			$.ajax({
 				url: trackUrl,
 				type: "post",
 				success: function(xml){
-					console.log(xml);
 					callback(xml);
 				},
 				error: function(xhr, textStatus, errorThrown){
@@ -309,28 +312,6 @@
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
 			function USPSStatus (){
-/*
-				var acceptedDate = function(){
-					if (trackingSumEvent.indexOf("Delivered") != -1) {
-						
-					}
-				};
-*/
-				var deliveredDate = function(){};
-				var alreadyAccepted = trackingDetails.filter(function(val, index, array) {
-					console.log(val.Event["#text"] === 'Out for Delivery');
-				});
-				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
-				console.log(trackingStringNoCurls);
-				var alreadyAccepted = $(trackingStringNoCurls).find('Accepted');
-				console.log(alreadyAccepted);
-				var found;
-				for(var value in trackingResponse) {
-					if(trackingResponse.hasOwnProperty('Accepted')) {
-						console.log('Hello!!!!!');
-						console.log(this);
-					}
-				}
 				function getObjects(obj, key, val) {
 				    var objects = [];
 				    for (var i in obj) {
@@ -344,35 +325,11 @@
 				    return objects;
 				}
 				console.log(getObjects(trackingResponse, '#text', 'Out for Delivery'));
-				if (trackingResponse instanceof Array) {
-					console.log("JSON is   Arrrrrrrrrrrrrrray   yo!  ");
-				} else {
-					console.log("JSON is objjjjjjject   yo!  ");
-				}
-/*
-				$('['+trackingResponse+']').forEach(function(entry) {
-					console.log('Hello?');
-					if (entry == "Accepted at USPS Origin Sort Facility") {
-						found = entry;
-						return true;
-					}
-					console.log("found --- " + found);
-				});
-*/
-/*
-				var a = array;
-				var index = 0;
-				var found;
-				var entry;
-				for (index = 0; index < a.length; ++index) {
-					entry = a[index];
-					if (entry.coupon_code == "COUPON1") {
-						found = entry;
-						break;
-					}
-				}
-*/
-
+				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
+				console.log(trackingStringNoCurls);
+				var deliveredDate = function(){};
+				var alreadyAccepted = (getObjects(trackingResponse, '#text', 'Accepted at USPS Origin Sort Facility').length > -1)?true:false;
+				console.log(alreadyAccepted);
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
 					var acceptedDate = '';
@@ -429,7 +386,7 @@
 			var newLineCords = {"width":"100%"};
 			$(window).load(function(){
 				progressStatus.animate(newLineCords, 3700)
-				setTimeout(function(){$('.shipped-status').fadeIn()}, 1700);
+				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
 				progressStatusDot.animate(newDotCords, 3700, function() {
 					progressStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
 				});
