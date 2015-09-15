@@ -228,9 +228,10 @@
 		function createUSPSTable(xml) {
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
-	        var trackingInfo = trackingJSON.TrackResponse.TrackInfo;
-	        var trackingID = trackingJSON.TrackResponse.TrackInfo["@attributes"].ID;
-	        var trackingSummary = trackingJSON.TrackResponse.TrackInfo.TrackSummary;
+	        var trackingResponse = trackingJSON.TrackResponse;
+	        var trackingInfo = trackingResponse.TrackInfo;
+	        var trackingID = trackingInfo["@attributes"].ID;
+	        var trackingSummary = trackingInfo.TrackSummary;
 	        var trackingSumEventTime = trackingSummary.EventTime["#text"];
 	        var trackingSumEventDate = trackingSummary.EventDate["#text"];
 	        var trackingSumEvent = trackingSummary.Event["#text"];
@@ -307,7 +308,7 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-			function USPSStatus (trackingSumEvent){
+			function USPSStatus (){
 /*
 				var acceptedDate = function(){
 					if (trackingSumEvent.indexOf("Delivered") != -1) {
@@ -316,6 +317,13 @@
 				};
 */
 				var deliveredDate = function(){};
+				var alreadyAccepted = trackingDetails.filter(function(val, index, array) {
+					console.log(val.Event["#text"] === 'Out for Delivery');
+				});
+				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
+				console.log(trackingStringNoCurls);
+				var alreadyAccepted = $(trackingStringNoCurls).find('Accepted');
+				console.log(alreadyAccepted);
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
 					var acceptedDate = '';
