@@ -47,6 +47,20 @@
 		display: inline;
 		transform: translateX(0px) translateZ(0px);
 	}
+	#AccountOrder .tracker-container .top {
+		position: relative;
+		width: 100%;
+		display: block;
+		min-height: 1em;
+		font-size: 17px;
+	}
+	#AccountOrder .tracker-container .top .latest-event-status {
+		position: absolute;
+		bottom: 0;
+		font-weight: 700;
+		display: inline;
+		opacity: 1;
+	}
 	#AccountOrder .tracker-container .bottom { 
 		position: relative;
 		width: 100%;
@@ -319,29 +333,44 @@
 		});
 	}
 	
-	function trackerLine() {
-		var trackerTop = '';
+	function trackerLine(shipStatusIndex) {
+		//Tracker line Top
+		var trackerTop = '<div class="top"><span class="latest-event-status" data-position="0"></span></div>';
+		//Tracker line Bottom
 		var orderDate = '%%GLOBAL_OrderDate%%';
 		var orderDayMonth = orderDate.split(" ").slice(0,2).join(" ");
 		//var shippingAddress = ('GLOBAL_ShippingAddress%%').text();
-		var shippingAddress = $('.ShippingDetails').text();
-		console.log(shippingAddress);
 		orderShipped = true;
 		var shippedDate = (orderShipped ? 'A Date' : '');
 		var shippedStatus = ((shippedDate != '') ? '<span class="shipped-status" data-position=""><i class="marker"></i>Shipped<span class="shipped-date">'+shippedDate+'</span></span>' : '');
 		orderDelivered = true;
 		var deliveryDate = (orderDelivered ? 'A Date' : '');
-		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+deliveryAddress+'</span></span></div>' : '');
+		var deliveryStatus = ((deliveryDate != '') ? '<span class="delivery-status"><span class="delivery-date">'+deliveryDate+'</span><span class="delivery-address">'+shippingAddress+'</span></span></div>' : '');
 		var trackerBottom = '<div class="bottom"><span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span></span>'+shippedStatus+deliveryStatus;
 		var trackerLineHTML = '<div style="display:none;" class="tracker-container">'+trackerTop+'<div class="tracker-line"><div class="package-status" data-width="">' 
-							+ '</div><i class="dot latest-event-dot" data-position="37.7119651571363" style="left: 334.950079445654px; visibility: visible; opacity: 1; display: inline; transform: translateX(0.950079445653955px) translateZ(0px);"></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
+							+ '</div><i class="dot latest-event-dot" data-position=""></i><i class="dot delivery-dot"></i></div>'+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
+		//Tracking Dot and Status Position -- ordered, shipped, delivered
+		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
+							  {"dotPos":{"side":"left","cord":"25%"},"text":"It\’s on the way"},
+							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
+		console.log(shippingStatus[shipStatusIndex]);
+		console.log(shippingStatus[shipStatusIndex].dotPos.side);
+		console.log(shippingStatus[shipStatusIndex].dotPos.cord);
+		console.log(shippingStatus[shipStatusIndex].text);
+		var shipStatusPosish = $('.latest-event-dot, .latest-event-status');
+		var shipStatusLine = $('.latest-event-status');
+		var shipStatusSide = shippingStatus[shipStatusIndex].dotPos.side;
+		var shipStatusCord = shippingStatus[shipStatusIndex].dotPos.cord;
+		var shipStatusText = shippingStatus[shipStatusIndex].text;
+		shipStatusPosish.css(shipStatusSide, shipStatusCord);
+		shipStatusLine.html(shipStatusText);
 	}
 	
 	function getTrackingInfo(shippingTrackingNumber) {
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
-			trackerLine();
+			trackerLine(shipStatusIndex);
 			USPSTracking(shippingTrackingNumber);
 		} else if (shippingTrackingNumber.length == 18) {
 			makeTrackingLink("FedEx", shippingTrackingNumber);
@@ -357,9 +386,11 @@
 
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-	var deliveryAddress = 'Delivery Address';
+	var shippingAddress = $('.ShippingDetails').text();
+	console.log(shippingAddress);
 	var orderShipped = false;
 	var orderDelivered = false;
+	var shipStatusIndex = '2';
 	getTrackingInfo(trackingNumber);
 	
 </script>​​​​​​
