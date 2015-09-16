@@ -325,11 +325,22 @@
 				    return objects;
 				}
 				console.log(getObjects(trackingResponse, '#text', 'Out for Delivery'));
+
 				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
-				console.log(trackingStringNoCurls);
-				var deliveredDate = function(){};
 				var alreadyAccepted = (getObjects(trackingResponse, '#text', 'Accepted at USPS Origin Sort Facility').length > -1)?true:false;
 				console.log(alreadyAccepted);
+				var id = "#text"; // Or whatever
+				var entry = trackingResponse[id];
+				console.log("entryyyy" + entry);
+
+				// Need to find this
+				// Need to find this
+				// Need to find this
+				var deliveredDate = function(){};
+				// Need to find this
+				// Need to find this
+				// Need to find this
+
 				if (trackingSumEvent.indexOf("Delivered") != -1) {
 					shipStatusIndex = 2;
 					var acceptedDate = '';
@@ -356,7 +367,6 @@
 	}
 	
 	function animateTrackerLine(shipStatusIndex) {
-		console.log(shipStatusIndex);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
@@ -368,7 +378,6 @@
 		var progressStatusCord = shippingStatus[shipStatusIndex.index].dotPos.cord;
 		var newDotCords = {[progressStatusSide]:progressStatusCord};
 		var progressStatusText = shippingStatus[shipStatusIndex.index].text;
-		console.log("HUH????  ---- " + progressStatusText);
 		var shippEDStatusDate = $('shipped-date');
 		progressStatusSpan.html(progressStatusText);
 		if (shipStatusIndex.index == 0) {
