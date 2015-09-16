@@ -311,24 +311,15 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-			function USPSStatus (){
-				function getObjects(obj, key, val) {
-				    var objects = [];
-				    for (var i in obj) {
-				        if (!obj.hasOwnProperty(i)) continue;
-				        if (typeof obj[i] == 'object') {
-				            objects = objects.concat(getObjects(obj[i], key, val));
-				        } else if (i == key && obj[key] == val) {
-				            objects.push(obj);
-				        }
-				    }
-				    return objects;
-				}
-				console.log(getObjects(trackingResponse, '#text', 'Out for Delivery'));
 
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			function USPSStatus (){
 				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
-				var alreadyAccepted = (getObjects(trackingResponse, '#text', 'Accepted at USPS Origin Sort Facility').length > -1)?true:false;
-				console.log(alreadyAccepted);
 				var id = "#text"; // Or whatever
 				var entry = trackingResponse[id];
 				console.log("entryyyy" + entry);
@@ -341,14 +332,31 @@
 				// Need to find this
 				// Need to find this
 
-				if (trackingSumEvent.indexOf("Delivered") != -1) {
+				function getObjects(obj, key, val) {
+				    var objects = [];
+				    for (var i in obj) {
+				        if (!obj.hasOwnProperty(i)) continue;
+				        if (typeof obj[i] == 'object') {
+				            objects = objects.concat(getObjects(obj[i], key, val));
+				        } else if (i == key && obj[key] == val) {
+				            objects.push(obj);
+				        }
+				    }
+				    return objects;
+				}
+				var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
+				console.log(alreadyDelivered);
+				var alreadyAccepted = (getObjects(trackingDetails, '#text', 'Accepted at USPS Origin Sort Facility').length > 0)?true:false;
+				console.log(alreadyAccepted);
+
+				if (alreadyDelivered) {
 					shipStatusIndex = 2;
 					var acceptedDate = '';
 					var deliveredDate = trackingSummary.EventDate["#text"];
 					var splitDate = deliveredDate.split(" ").slice(0,2);
 					var formattedDate = splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
 					var deliveredAddress = '' + trackingSummary.EventCity["#text"] + ', ' + trackingSummary.EventState["#text"];
-				} else if (trackingSumEvent.indexOf("Accepted") != -1) {
+				} else if (alreadyAccepted) {
 					shipStatusIndex = 1;
 				} else {
 					shipStatusIndex = 0;
@@ -361,6 +369,12 @@
 					};
 			}
 			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 		}
 		var ajaxCallback = function (xml) {createUSPSTable(xml);}
 		getUSPSData(USPSUrl, ajaxCallback);
@@ -405,7 +419,7 @@
 				progressStatus.animate(newLineCords, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
 				progressStatusDot.animate(newDotCords, 3700, function() {
-					progressStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
+					progressStatusSpan.css({'left':'auto','right':'0','text-align':'right'}).fadeIn('1300');
 				});
 			})
 		}
