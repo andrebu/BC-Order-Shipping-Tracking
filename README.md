@@ -81,6 +81,11 @@ BC Order Shipping Tracking
 - [Jquery filter not working with jquery object](http://stackoverflow.com/questions/17413742/jquery-filter-not-working-with-jquery-object)
 - [Javascript: How to filter object array based on attributes?](http://stackoverflow.com/questions/2722159/javascript-how-to-filter-object-array-based-on-attributes)
 - [How to find a JSON object member based on a string value](http://stackoverflow.com/questions/12029749/how-to-find-a-json-object-member-based-on-a-string-value)
+- [How to check if the JSON data is one object or an array of objects?](http://stackoverflow.com/questions/5909189/how-to-check-if-the-json-data-is-one-object-or-an-array-of-objects)
+- [use jQuery's find() on JSON object](http://stackoverflow.com/questions/4992383/use-jquerys-find-on-json-object)
+- []()
+- []()
+- []()
 - []()
 - []()
 ###FedEx
