@@ -381,23 +381,28 @@
 		var shippEDStatusDate = $('shipped-date');
 		progressStatusSpan.html(progressStatusText);
 		if (shipStatusIndex.index == 0) {
-			progressStatusSpan.css({'left':'0','width':'180px'}).fadeIn('1300');
+			$(window).load(function(){
+				progressStatus.animate({'width':'80px'}, 1300);
+				progressStatusDot.animate({'left':'56px'}, 1300, function() {
+					progressStatusSpan.css({'width':'180px'}).fadeIn('1300');
+				});
+			})
 		} else if (shipStatusIndex.index == 1) {
 			var progressWidthCalc = parseInt((progressStatusCord.replace('%', ''))) + 4;
 			var newLineCords = {"width":""+progressWidthCalc+"%"};
 			shippEDStatusDate.html(shipStatusIndex.acceptedDate);
 			$(window).load(function(){
-				progressStatus.animate(newLineCords, 3700)
+				progressStatus.animate(newLineCords, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 2800);
 				progressStatusDot.animate(newDotCords, 3700, function() {
-					progressStatusSpan.fadeIn('1300'); //.add('.shipped-status')
+					progressStatusSpan.fadeIn('1300');
 				});
 			})
 		} else if (shipStatusIndex.index == 2) {
 			progressStatusSpan.html(progressStatusText + ' ' + shipStatusIndex.deliveredDate);
 			var newLineCords = {"width":"100%"};
 			$(window).load(function(){
-				progressStatus.animate(newLineCords, 3700)
+				progressStatus.animate(newLineCords, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
 				progressStatusDot.animate(newDotCords, 3700, function() {
 					progressStatusSpan.css({'left':'auto','right':'0'}).fadeIn('1300');
