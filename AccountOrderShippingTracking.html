@@ -181,16 +181,14 @@
 	}
 	function createTrackerLine() {
 		//Tracker line Bottom
-		var orderDate = '%%GLOBAL_OrderDate%%';
-		var orderDayMonthSliced = orderDate.split(" ").slice(0,2);
-		var orderDayMonth = '' + orderDayMonthSliced[1] + ' ' + orderDayMonthSliced[0].replace(/\D/g,'') + '';
+		var orderMonthDay = formatDate('%%GLOBAL_OrderDate%%');
 		var shippedDate = '<span class="shipped-date"></span>';
 		var shippedStatus = '<span class="shipped-status"><i class="marker"></i>Shipped'+shippedDate+'</span>';
 		var deliveryDate = '<span class="delivery-date"></span>';
 		var formattedAddress = shippingAddress;
 		var shipTrackerAddress = '<span class="delivery-address">'+formattedAddress+'</span>';
 		var deliveryStatus = '<span class="delivery-status">'+ deliveryDate + shipTrackerAddress + '</span></div>';
-		var orderedStatus = '<span class="ordered-status">Ordered<span class="ordered-date">'+orderDayMonth+'</span>';
+		var orderedStatus = '<span class="ordered-status">Ordered<span class="ordered-date">'+orderMonthDay+'</span>';
 		var trackerBottom = '<div class="bottom">' + orderedStatus + '</span>'+shippedStatus+deliveryStatus;
 		var trackerDots = '<i class="dot latest-event-dot"><span class="latest-event-status"></span></i><i class="dot delivery-dot"></i>';
 		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
@@ -472,8 +470,16 @@
 
 	// Date format function
 	function formatDate( fullDate ) {
-		var splitDate = $(fullDate.split(" ").slice(0,2));
-		return splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
+		function isNumeric(n) {
+			return !jQuery.isArray( n ) && (n - parseFloat( n ) + 1) >= 0;
+		}
+		if (isNumeric(fullDate.charAt(0))) {
+			var splitDate = $(fullDate.split(" ").slice(0,2));
+			return '' + splitDate[1] + ' ' + splitDate[0].replace(/\D/g,'') + '';
+		} else {
+			var splitDate = $(fullDate.split(" ").slice(0,2));
+			return splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
+		}
 	}
 
 	// Changes XML to JSON
