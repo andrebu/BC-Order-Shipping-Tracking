@@ -319,6 +319,51 @@
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			function USPSStatus (){
+				// new function for searching
+				// new function for searching
+				// new function for searching
+			    var historyDates = {
+			        "Pre-Shipment Info Sent to USPS": "",
+			        "Accepted at USPS Origin Sort Facility": "",
+			        "Arrived at USPS Origin Facility": "",
+			        "Arrived at USPS Destination Facility": "",
+			        "Departed USPS Facility": "",
+			        "Arrived at Post Office": "",
+			        "Departed USPS Facility": "",
+			        "Arrived at USPS Facility": "",
+			        "Sorting Complete": "",
+			        "Out for Delivery": ""
+			    };
+			    function ContainsKeyValue(obj, key, value) {
+			        if (obj[key] === value) return true;
+			        for (all in obj) {
+			            if (obj[all] != null && obj[all][key] === value) {
+			                return true;
+			            }
+			            if (typeof obj[all] == "object" && obj[all] != null) {
+			                var found = ContainsKeyValue(obj[all], key, value);
+			                if (found == true) return true;
+			            }
+			        }
+			        return false;
+			    }
+			    for (var eventType in historyDates) {
+			        for (var i = 0; i < trackingDetails.length; i++) {
+			            var detail = trackingDetails[i];
+			            if (ContainsKeyValue(detail, "#text", eventType)) {
+			                historyDates[eventType] = detail.EventDate["#text"];
+			            }
+			        }
+			    }
+				console.log(historyDates);
+				console.log(historyDates["Accepted at USPS Origin Sort Facility"]);
+				var acceptedCheck = historyDates["Accepted at USPS Origin Sort Facility"];
+				var acceptedDate = acceptedCheck != '' ? formatDate(acceptedCheck) : '';
+				// new function for searching
+				// new function for searching
+				// new function for searching
+				
+				
 				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
 				var id = "#text"; // Or whatever
 				var entry = trackingResponse[id];
@@ -351,10 +396,7 @@
 
 				if (alreadyDelivered) {
 					shipStatusIndex = 2;
-					var acceptedDate = '';
-					var deliveredDate = trackingSummary.EventDate["#text"];
-					var splitDate = deliveredDate.split(" ").slice(0,2);
-					var formattedDate = splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
+					var deliveredDate = formatDate(trackingSummary.EventDate["#text"]);
 					var deliveredAddress = '' + trackingSummary.EventCity["#text"] + ', ' + trackingSummary.EventState["#text"];
 				} else if (alreadyAccepted) {
 					shipStatusIndex = 1;
@@ -364,7 +406,7 @@
 				return {
 					index: shipStatusIndex,
 					acceptedDate: acceptedDate,
-					deliveredDate: formattedDate,
+					deliveredDate: deliveredDate,
 					deliveredAddress: deliveredAddress
 					};
 			}
@@ -381,6 +423,8 @@
 	}
 	
 	function animateTrackerLine(shipStatusIndex) {
+		console.log('HELLO!');
+		console.log(shipStatusIndex.acceptedDate);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingStatus = [{"dotPos":{"side":"left","cord":"0"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"33%"},"text":"It\’s on the way"},
@@ -392,7 +436,7 @@
 		var progressStatusCord = shippingStatus[shipStatusIndex.index].dotPos.cord;
 		var newDotCords = {[progressStatusSide]:progressStatusCord};
 		var progressStatusText = shippingStatus[shipStatusIndex.index].text;
-		var shippEDStatusDate = $('shipped-date');
+		var shippEDDateField = $('.shipped-date');
 		progressStatusSpan.html(progressStatusText);
 		if (shipStatusIndex.index == 0) {
 			$(window).load(function(){
@@ -404,17 +448,18 @@
 		} else if (shipStatusIndex.index == 1) {
 			var progressWidthCalc = parseInt((progressStatusCord.replace('%', ''))) + 4;
 			var newLineCords = {"width":""+progressWidthCalc+"%"};
-			shippEDStatusDate.html(shipStatusIndex.acceptedDate);
+			shippEDDateField.html(shipStatusIndex.acceptedDate);
 			$(window).load(function(){
 				progressStatus.animate(newLineCords, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 2800);
 				progressStatusDot.animate(newDotCords, 3700, function() {
-					progressStatusSpan.fadeIn('1300');
+					progressStatusSpan.css({'width':'134px'}).fadeIn('1300');
 				});
 			})
 		} else if (shipStatusIndex.index == 2) {
 			progressStatusSpan.html(progressStatusText + ' ' + shipStatusIndex.deliveredDate);
 			var newLineCords = {"width":"100%"};
+			shippEDDateField.html(shipStatusIndex.acceptedDate);
 			$(window).load(function(){
 				progressStatus.animate(newLineCords, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
@@ -423,6 +468,12 @@
 				});
 			})
 		}
+	}
+
+	// Date format function
+	function formatDate( fullDate ) {
+		var splitDate = $(fullDate.split(" ").slice(0,2));
+		return splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
 	}
 
 	// Changes XML to JSON
