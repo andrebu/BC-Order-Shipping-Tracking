@@ -208,12 +208,22 @@
 
 	function USPSTracking(shippingTrackingNumber, callback) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+		console.log(httpPrefix);
 		var corsAnyUrl = '//cors-anywhere.herokuapp.com/';
+		var BCTrackingID = '%%GLOBAL_TrackingLink%%';
+		if (isNumeric(BCTrackingID.charAt(0))) {
+			var trackingLinkID = BCTrackingID;
+		} else {
+			var trackingLinkID = BCTrackingID.split('rackNum=')[1].split('" target=')[0];
+		}
+		console.log(trackingLinkID);
+
 		var USPSId = '689DSSHI5238';
 		var USPSUrl1 = '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="';
-		var USPSUrl2 = '"><TrackID ID="%%GLOBAL_TrackingLink%%"></TrackID></TrackFieldRequest>'
+		var USPSUrl2 = '"><TrackID ID="'+trackingLinkID+'"></TrackID></TrackFieldRequest>'
 		var USPSUrl = httpPrefix + corsAnyUrl + USPSUrl1 + USPSId + USPSUrl2;
-		function getUSPSData(trackUrl, callback) {		
+		function getUSPSData(trackUrl, callback) {	
+			console.log(trackUrl);	
 			$.ajax({
 				url: trackUrl,
 				type: "post",
@@ -230,6 +240,7 @@
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
 	        var trackingResponse = trackingJSON.TrackResponse;
+	        console.log(trackingResponse);
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
 	        var trackingSummary = trackingInfo.TrackSummary;
@@ -428,9 +439,6 @@
 
 	// Date format function
 	function formatDate( fullDate ) {
-		function isNumeric(n) {
-			return !jQuery.isArray( n ) && (n - parseFloat( n ) + 1) >= 0;
-		}
 		if (isNumeric(fullDate.charAt(0))) {
 			var splitDate = $(fullDate.split(" ").slice(0,2));
 			return '' + splitDate[1] + ' ' + splitDate[0].replace(/\D/g,'') + '';
@@ -438,6 +446,11 @@
 			var splitDate = $(fullDate.split(" ").slice(0,2));
 			return splitDate[0].slice(0,3) + ' ' + splitDate[1].replace(/\D/g,'');
 		}
+	}
+
+	// Func to check if a char is numberic or not
+	function isNumeric(n) {
+		return !jQuery.isArray( n ) && (n - parseFloat( n ) + 1) >= 0;
 	}
 
 	// Changes XML to JSON
