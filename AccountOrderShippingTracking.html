@@ -250,22 +250,20 @@
 	        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
 	        console.log("Tracking Event Name:" + trackingSumEventEventName);
 */
-			function getObjects(obj, key, val) {
-				var objects = [];
-				for (var i in obj) {
-					if (!obj.hasOwnProperty(i)) continue;
-					if (typeof obj[i] == 'object') {
-						objects = objects.concat(getObjects(obj[i], key, val));
-					} else if (i == key && obj[key] == val) {
-						objects.push(obj);
-					}
-				}
-				return objects;
-			}				
-			//if (trackingSumEvent.hasOwnProperty('Delivered')) {console.log('DELIVEREDDDDDDDDDDDDDDDDDDDDDDDDDDD!!!!!');}
-			var shipmentDelivered = getObjects(trackingSummary, '#text', 'Delivered, Front Door/Porch');
-			if (shipmentDelivered) {
-				var summaryRowText = 'Your item was delivered at the front door or porch at '+trackingSumEventTime+' ';
+			// IF already delivered, add green bubble with 
+			var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
+			if (alreadyDelivered) {
+				var delAttText = {
+					"01": "In/At your Mailbox",
+					"02": "and left at your Front Door/Porch",
+					"03": "to your Parcel Locker",
+					"04": "and left with an Individual (at Address)",
+					"05": "and left at Front Desk/Reception",
+					"06": "to Other at Address (Garage/Side or Back Door/Porch)",
+					"07": "and left with Neighbor (by Request)"
+				};
+				var delAttCode = trackingSummary.DeliveryAttributeCode["#text"];
+				var summaryRowText = 'Your item was delivered '+delAttText[delAttCode]+' at '+trackingSumEventTime+' ';
 				summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
 				summaryRowText += ''+trackingSumEventEventZIPCode+'';
 				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
@@ -275,6 +273,7 @@
 				var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
 				console.log("Guaranteed Delivery Date:" + guarDelDate);
 			}
+			//Populate the rest of the <tr> table rows with tracking steps from TrackingDetails
 	        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail;
 			var odd_even = true;
 			$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
@@ -312,12 +311,7 @@
 
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			function USPSStatus (){
-				// new function for searching
 				// new function for searching
 				// new function for searching
 			    var historyDates = {
@@ -355,43 +349,11 @@
 			    }
 				console.log(historyDates);
 				console.log(historyDates["Accepted at USPS Origin Sort Facility"]);
-				var acceptedCheck = historyDates["Accepted at USPS Origin Sort Facility"];
-				var acceptedDate = acceptedCheck != '' ? formatDate(acceptedCheck) : '';
-				// new function for searching
+				var alreadyAccepted = historyDates["Accepted at USPS Origin Sort Facility"] != '' ? true : false;
+				var acceptedDate = alreadyAccepted ? formatDate(historyDates["Accepted at USPS Origin Sort Facility"]) : '';
 				// new function for searching
 				// new function for searching
 				
-				
-				var trackingStringNoCurls = '' + trackingString.replace(/[{\[\]}]/g, '').replace(/[":,]/g, " ") + '';
-				var id = "#text"; // Or whatever
-				var entry = trackingResponse[id];
-				console.log("entryyyy" + entry);
-
-				// Need to find this
-				// Need to find this
-				// Need to find this
-				var deliveredDate = function(){};
-				// Need to find this
-				// Need to find this
-				// Need to find this
-
-				function getObjects(obj, key, val) {
-				    var objects = [];
-				    for (var i in obj) {
-				        if (!obj.hasOwnProperty(i)) continue;
-				        if (typeof obj[i] == 'object') {
-				            objects = objects.concat(getObjects(obj[i], key, val));
-				        } else if (i == key && obj[key] == val) {
-				            objects.push(obj);
-				        }
-				    }
-				    return objects;
-				}
-				var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
-				console.log(alreadyDelivered);
-				var alreadyAccepted = (getObjects(trackingDetails, '#text', 'Accepted at USPS Origin Sort Facility').length > 0)?true:false;
-				console.log(alreadyAccepted);
-
 				if (alreadyDelivered) {
 					shipStatusIndex = 2;
 					var deliveredDate = formatDate(trackingSummary.EventDate["#text"]);
@@ -406,13 +368,9 @@
 					acceptedDate: acceptedDate,
 					deliveredDate: deliveredDate,
 					deliveredAddress: deliveredAddress
-					};
+				};
 			}
 			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 		}
