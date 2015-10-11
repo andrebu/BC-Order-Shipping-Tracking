@@ -75,7 +75,6 @@
 		top: 0;
 		background: #fff;
 	}
-	#AccountOrder .tracker-container .bottom .delivery-address, 
 	#AccountOrder .tracker-container .bottom .ordered-date, 
 	#AccountOrder .tracker-container .bottom .shipped-date, 
 	#AccountOrder .tracker-container .bottom .summary-text {
@@ -100,6 +99,7 @@
 		right: 0;
 		text-align: right;
 		color: #008a00;
+		text-transform: uppercase;
 	}
 	/* Tracking Table CSS */
 	#AccountOrder .tracking-table {
@@ -156,7 +156,7 @@
 <script type="text/javascript">
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-	var shippingAddress = $('.ShippingDetails').text();
+	var shippingAddress = $('.ShippingDetails .address-city').text() + ', ' + $('.ShippingDetails .address-state').text();
 	console.log(shippingAddress);
 	var orderShipped = false;
 	var orderDelivered = false;
@@ -194,6 +194,7 @@
 		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
 		var trackerLineHTML = '<div class="tracker-container">'+trackerLine+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
+		console.log('%%GLOBAL_ShipAddressLine1%% %%GLOBAL_ShipAddressLine2%%, %%GLOBAL_ShipSuburb%%, %%GLOBAL_ShipState%% %%GLOBAL_ShipZip%%, %%GLOBAL_ShipCountry%%​​');
 	}
 
 	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
@@ -418,7 +419,7 @@
 		var progressStatusSide = shippingConfig[configIndex].dotPos.side;
 		var progressStatusCord = shippingConfig[configIndex].dotPos.cord;
 		var progressStatusText = shippingConfig[configIndex].text;
-		var shippedMultiplier = shipStatusData.afterAccept * 6;
+		var shippedMultiplier = shipStatusData.afterAccept * 5;
 		var shippEDDateField = $('.shipped-date');
 		progressStatusSpan.html(progressStatusText);
 
