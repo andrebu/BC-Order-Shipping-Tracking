@@ -244,16 +244,16 @@
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
 	        var trackingSummary = trackingInfo.TrackSummary;
-	        var trackingSumEventTime = trackingSummary.EventTime["#text"] ? trackingSummary.EventTime["#text"] : '';
+	        var trackingSumEventTime = trackingSummary.EventTime["#text"] ? ', ' + trackingSummary.EventTime["#text"] : '';
 	        var trackingSumEventDate = trackingSummary.EventDate["#text"];
 	        var trackingSumEvent = trackingSummary.Event["#text"];
 	        var trackingSumEventCity = trackingSummary.EventCity["#text"] ? trackingSummary.EventCity["#text"] : '';
-	        var trackingSumEventState = trackingSummary.EventState["#text"] ? trackingSummary.EventState["#text"] : '';
+	        var trackingSumEventState = trackingSummary.EventState["#text"] ? ', ' + trackingSummary.EventState["#text"] : '';
 	        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"] ? trackingSummary.EventZIPCode["#text"] : '';
 	        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"] ? trackingSummary.EventCountry["#text"] : '';
-	        var sumDateTimeCol = '<td>' + trackingSumEventDate + ', ' + trackingSumEventTime + '</td>';
+	        var sumDateTimeCol = '<td>' + trackingSumEventDate + trackingSumEventTime + '</td>';
 	        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
-	        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
+	        var sumLocCol = '<td>' + trackingSumEventCity + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
 			var tableRows = '<tr class="even">'+sumDateTimeCol+sumStatusCol+sumLocCol+'</tr>';
 /*
 	        var trackingSumEventEventFirstName = trackingSummary.FirstName["#text"];
