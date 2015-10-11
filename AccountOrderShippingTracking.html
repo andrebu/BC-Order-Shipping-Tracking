@@ -244,13 +244,13 @@
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
 	        var trackingSummary = trackingInfo.TrackSummary;
-	        var trackingSumEventTime = trackingSummary.EventTime["#text"];
+	        var trackingSumEventTime = trackingSummary.EventTime["#text"] ? trackingSummary.EventTime["#text"] : '';
 	        var trackingSumEventDate = trackingSummary.EventDate["#text"];
 	        var trackingSumEvent = trackingSummary.Event["#text"];
-	        var trackingSumEventCity = trackingSummary.EventCity["#text"];
-	        var trackingSumEventState = trackingSummary.EventState["#text"];
-	        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"];
-	        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"];
+	        var trackingSumEventCity = trackingSummary.EventCity["#text"] ? trackingSummary.EventCity["#text"] : '';
+	        var trackingSumEventState = trackingSummary.EventState["#text"] ? trackingSummary.EventState["#text"] : '';
+	        var trackingSumEventEventZIPCode = trackingSummary.EventZIPCode["#text"] ? trackingSummary.EventZIPCode["#text"] : '';
+	        var trackingSumEventEventCountry = trackingSummary.EventCountry["#text"] ? trackingSummary.EventCountry["#text"] : '';
 	        var sumDateTimeCol = '<td>' + trackingSumEventDate + ', ' + trackingSumEventTime + '</td>';
 	        var sumStatusCol = '<td>' + trackingSumEvent + '</td>';
 	        var sumLocCol = '<td>' + trackingSumEventCity + ', ' + trackingSumEventState + '  ' + trackingSumEventEventZIPCode + '</td>';
@@ -263,6 +263,7 @@
 */
 			// IF already delivered, add green bubble with 
 			var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
+	        console.log('has it been delivered?', alreadyDelivered);
 			if (alreadyDelivered) {
 				var delAttText = {
 					"01": "In/At your Mailbox",
@@ -280,34 +281,40 @@
 				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
 				tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
 			}
+			console.log(tableRows);
+/*
 			if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
 				var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
 				console.log("Guaranteed Delivery Date:" + guarDelDate);
 			}
+*/
 			//Populate the rest of the <tr> table rows with tracking steps from TrackingDetails
-	        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail;
-			var odd_even = true;
-			$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
-		        var detailEventDate = TrackingStepDetails.EventDate["#text"];
-		        var detailEventTime = TrackingStepDetails.EventTime["#text"];
-		        var detailEvent = TrackingStepDetails.Event["#text"];
-		        var detailEventCity = TrackingStepDetails.EventCity["#text"];
-		        var detailEventState = TrackingStepDetails.EventState["#text"];
-		        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
-				if (typeof detailEventTime !== 'undefined') {
-					var dateTimeCol = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
-				} else {
-					var dateTimeCol = '<td>' + detailEventDate + '</td>';
-				}
-				var statusCol = '<td>' + detailEvent + '</td>';
-				if (typeof detailEventCity !== 'undefined') {
-					var locCol = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
-				} else {
-					var locCol = '<td></td>';
-				}
-		        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
-		        odd_even = !odd_even;               
-			});
+	        var trackingDetails = trackingJSON.TrackResponse.TrackInfo.TrackDetail ? trackingJSON.TrackResponse.TrackInfo.TrackDetail : false;
+			function popTableDetails() {
+				var odd_even = true;
+				$.each(trackingDetails, function( trackingStepID, TrackingStepDetails ) {
+			        var detailEventDate = TrackingStepDetails.EventDate["#text"];
+			        var detailEventTime = TrackingStepDetails.EventTime["#text"];
+			        var detailEvent = TrackingStepDetails.Event["#text"];
+			        var detailEventCity = TrackingStepDetails.EventCity["#text"];
+			        var detailEventState = TrackingStepDetails.EventState["#text"];
+			        var detailEventEventZIPCode = TrackingStepDetails.EventZIPCode["#text"];
+					if (typeof detailEventTime !== 'undefined') {
+						var dateTimeCol = '<td>' + detailEventDate + ', ' + detailEventTime + '</td>';
+					} else {
+						var dateTimeCol = '<td>' + detailEventDate + '</td>';
+					}
+					var statusCol = '<td>' + detailEvent + '</td>';
+					if (typeof detailEventCity !== 'undefined') {
+						var locCol = '<td>' + detailEventCity + ', ' + detailEventState + '  ' + detailEventEventZIPCode + '</td>';
+					} else {
+						var locCol = '<td></td>';
+					}
+			        tableRows += '<tr class="'+( odd_even ? 'odd' : 'even')+'">'+dateTimeCol+statusCol+locCol+'</tr>';
+			        odd_even = !odd_even;               
+				});
+			}
+			if (trackingDetails) popTableDetails();
 			var tableHead = '<thead><tr class="tbl-head">' +
 							'<th scope="col" class="tbl-date-time">' +
 								'<div class="thpad">Date &amp; Time</div></th>' +
@@ -319,6 +326,7 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
+			console.log(trackingTable);
 
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
