@@ -371,7 +371,7 @@
 				var alreadyAccepted = historyDates["Accepted at USPS Origin Sort Facility"] != '' ? true : false;
 				var acceptedDate = alreadyAccepted ? formatDate(historyDates["Accepted at USPS Origin Sort Facility"]) : '';
 				// new function for searching
-				var afterAcceptance = null;
+				var afterAcceptance = trackingDetails.length > 1 ? true : false;
 				// new function for searching
 				
 				if (alreadyDelivered) {
@@ -380,6 +380,7 @@
 					var deliveredAddress = '' + trackingSummary.EventCity["#text"] + ', ' + trackingSummary.EventState["#text"];
 				} else if (afterAcceptance) {
 					shipStatusIndex = 2;
+					console.log('there are this many items in details', trackingDetails.length);
 				} else if (alreadyAccepted) {
 					shipStatusIndex = 1;
 				} else {
@@ -392,7 +393,7 @@
 					deliveredAddress: deliveredAddress
 				};
 			}
-			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusIndex){animateTrackerLine(shipStatusIndex);});
+			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusData){animateTrackerLine(shipStatusData);});
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 		}
@@ -400,11 +401,12 @@
 		getUSPSData(USPSUrl, ajaxCallback);
 	}
 	
-	function animateTrackerLine(shipStatusIndex) {
+	function animateTrackerLine(shipStatusData) {
 		console.log('HELLO!');
-		console.log(shipStatusIndex.acceptedDate);
+		console.log(shipStatusData);
+		console.log(shipStatusData.acceptedDate);
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
-		var shippingStatus = [{"dotPos":{"side":"left","cord":"12"},"text":"We\'ve got your order"},
+		var shippingConfig = [{"dotPos":{"side":"left","cord":"12"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"28"},"text":"The carrier now has the package"},
 							  {"dotPos":{"side":"left","cord":"33"},"text":"It\’s on the way"},
 							  {"dotPos":{"side":"right","cord":"0"},"text":"Delivered on"}];
@@ -412,13 +414,13 @@
 		var progressStatus = $('.package-status');
 		var progressStatusSpan = $('.latest-event-status');
 		var progressStatusDot = $('.latest-event-dot');
-		var progressStatusSide = shippingStatus[shipStatusIndex.index].dotPos.side;
-		var progressStatusCord = shippingStatus[shipStatusIndex.index].dotPos.cord;
+		var progressStatusSide = shippingConfig[shipStatusData.index].dotPos.side;
+		var progressStatusCord = shippingConfig[shipStatusData.index].dotPos.cord;
 		var newDotCords = {[progressStatusSide]:progressStatusCord};
-		var progressStatusText = shippingStatus[shipStatusIndex.index].text;
+		var progressStatusText = shippingConfig[shipStatusData.index].text;
 		var shippEDDateField = $('.shipped-date');
 		progressStatusSpan.html(progressStatusText);
-		if (shipStatusIndex.index == 0) {
+		if (shipStatusData.index == 0) {
 			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
 			$(window).load(function(){
 				setTimeout(function(){
@@ -428,9 +430,9 @@
 					});
 				}, 1370);
 			})
-		} else if (shipStatusIndex.index == 1) {
+		} else if (shipStatusData.index == 1) {
 			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
-			shippEDDateField.html(shipStatusIndex.acceptedDate);
+			shippEDDateField.html(shipStatusData.acceptedDate);
 			$(window).load(function(){
 				setTimeout(function(){
 					progressStatus.animate({'width':''+thisWidth+'%'}, 3700);
@@ -440,9 +442,9 @@
 					});
 				}, 1370);
 			})
-		} else if (shipStatusIndex.index == 2) {
+		} else if (shipStatusData.index == 2) {
 			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
-			shippEDDateField.html(shipStatusIndex.acceptedDate);
+			shippEDDateField.html(shipStatusData.acceptedDate);
 			$(window).load(function(){
 				setTimeout(function(){
 					progressStatus.animate({'width':''+thisWidth+'%'}, 3700);
@@ -452,9 +454,9 @@
 					});
 				}, 1370);
 			})
-		} else if (shipStatusIndex.index == 3) {
-			progressStatusSpan.html(progressStatusText + ' ' + shipStatusIndex.deliveredDate);
-			shippEDDateField.html(shipStatusIndex.acceptedDate);
+		} else if (shipStatusData.index == 3) {
+			progressStatusSpan.html(progressStatusText + ' ' + shipStatusData.deliveredDate);
+			shippEDDateField.html(shipStatusData.acceptedDate);
 			$(window).load(function(){
 				progressStatus.animate({'width':'100%'}, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
