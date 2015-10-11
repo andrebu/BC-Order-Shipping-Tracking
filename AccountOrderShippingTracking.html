@@ -16,7 +16,7 @@
 	}
 	#AccountOrder .tracker-container .latest-event-status {
 		position: absolute;
-		top: -30px;
+		top: -35px;
 		left: -50px;
 		width: 200px;
 		font-size: 17px;
@@ -24,6 +24,10 @@
 		font-style: initial;
 		text-align: center;
 		display: none;
+	}
+	#AccountOrder .tracker-container .latest-event-status i {
+		font-size: 10px;
+		display: block;
 	}
 	#AccountOrder .tracker-container .tracker-line .package-status {
 		position: absolute;
@@ -169,7 +173,6 @@
 		runTrackingWidget(trackingNumber);
 	});
 	function runTrackingWidget(shippingTrackingNumber) {
-		createTrackerLine();
 		if (shippingTrackingNumber.length == 22) {
 			makeTrackingLink("USPS", shippingTrackingNumber);
 			USPSTracking(shippingTrackingNumber, animateTrackerLine);
@@ -184,7 +187,17 @@
 			//FedExTracking(shippingTrackingNumber);
 		}
 	}
-	function createTrackerLine() {
+	
+	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
+	function makeTrackingLink(carrierCompany, shippingTrackingNumber) {
+		var anchorLink = {'USPS':'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=',
+						  'FedEx':'http://fedex.com/Tracking?action=track&language=english&cntry_code=us&tracknumbers=',
+						  'UPS':'http://wwwapps.ups.com/WebTracking/track?loc=en_US&track.x=Track&trackNums='};
+		var trackingAnchorLink = '<a href="' + anchorLink[carrierCompany]; 
+		trackingAnchorLink += '' + shippingTrackingNumber + '" target="_blank" class="green">' + shippingTrackingNumber + '</a>';
+		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
+	}
+	function createTrackerLine(currentLocation) {
 		//Tracker line Bottom
 		var orderMonthDay = formatDate('%%GLOBAL_OrderDate%%');
 		var shippedDate = '<span class="shipped-date"></span>';
@@ -194,20 +207,11 @@
 		var deliveryStatus = '<span class="delivery-status">'+ deliveryDate + shipTrackerAddress + '</span></div>';
 		var orderedStatus = '<span class="ordered-status">Ordered<span class="ordered-date">'+orderMonthDay+'</span>';
 		var trackerBottom = '<div class="bottom">' + orderedStatus + '</span>'+shippedStatus+deliveryStatus;
-		var trackerDots = '<i class="dot latest-event-dot"><span class="latest-event-status"></span></i><i class="dot delivery-dot"></i>';
+		var trackerLatest = '<span class="latest-event-status"><span></span><i>(Last scan: ' + currentLocation + ')</i></span>';
+		var trackerDots = '<i class="dot latest-event-dot">'+trackerLatest+'</i><i class="dot delivery-dot"></i>';
 		var trackerLine = '<div class="tracker-line"><div class="package-status"></div>'+trackerDots+'</div>'
 		var trackerLineHTML = '<div class="tracker-container">'+trackerLine+trackerBottom+'</div>';
 		pageEnd.append(trackerLineHTML);
-	}
-
-	//Create a clickable anchor link for the correct tracking number and shipping carrier combo
-	function makeTrackingLink(carrierCompany, shippingTrackingNumber) {
-		var anchorLink = {'USPS':'https://tools.usps.com/go/TrackConfirmAction.action?tLabels=',
-						  'FedEx':'http://fedex.com/Tracking?action=track&language=english&cntry_code=us&tracknumbers=',
-						  'UPS':'http://wwwapps.ups.com/WebTracking/track?loc=en_US&track.x=Track&trackNums='};
-		var trackingAnchorLink = '<a href="' + anchorLink[carrierCompany]; 
-		trackingAnchorLink += '' + shippingTrackingNumber + '" target="_blank" class="green">' + shippingTrackingNumber + '</a>';
-		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 	}
 
 	function USPSTracking(shippingTrackingNumber, callback) {
@@ -265,6 +269,19 @@
 	        console.log("Tracking Event First Name:" + trackingSumEventEventFirstName);
 	        console.log("Tracking Event Name:" + trackingSumEventEventName);
 */
+
+			console.log(trackingSummary.EventCountry);
+			console.log(trackingSumEventCity, trackingSumEventState);
+			if (!trackingSummary.EventCountry) {
+				var currentLoc = trackingSummary.EventCountry;
+			console.log(currentLoc);
+			} else {
+				var currentLoc = trackingSumEventCity + trackingSumEventState;
+			console.log(currentLoc);
+			}
+			console.log(currentLoc);
+			createTrackerLine(currentLoc);
+
 			// IF already delivered, add green bubble with 
 			var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
 	        console.log('has it been delivered?', alreadyDelivered);
@@ -418,21 +435,25 @@
 		var domTrackerLine = $('.tracker-line');
 		var progressStatus = $('.package-status');
 		var progressStatusSpan = $('.latest-event-status');
+		var progressStatusSpanText = $('.latest-event-status span');
+		var progressStatusScan = $('.latest-event-status i');
+		console.log(progressStatusSpanText);
 		var progressStatusDot = $('.latest-event-dot');
 		var progressStatusSide = shippingConfig[configIndex].dotPos.side;
 		var progressStatusCord = shippingConfig[configIndex].dotPos.cord;
 		var progressStatusText = shippingConfig[configIndex].text;
 		var shippedMultiplier = shipStatusData.afterAccept * 5;
 		var shippEDDateField = $('.shipped-date');
-		progressStatusSpan.html(progressStatusText);
+		progressStatusSpanText.html(progressStatusText);
 
 		if (shipStatusData.index == 0) {
+			progressStatusScan.hide();
 			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
 			$(window).load(function(){
 				setTimeout(function(){
 					progressStatus.animate({'width':''+thisWidth+'%'}, 1300);
 					progressStatusDot.animate({'left':''+progressStatusCord+'%'}, 1300, function() {
-						progressStatusSpan.css({'width':'180px'}).fadeIn('1300');
+						progressStatusSpan.css({'width':'180px','top':'-30px'}).fadeIn('1300');
 					});
 				}, 1370);
 			})
@@ -525,8 +546,8 @@
 		}
 		return obj;
 	};
-	String.prototype.capitalizeFirstLetter = function() {
-		var splitState = this.split(' ');
+	function capitalizeFirstLetter(someState) {
+		var splitState = someState.split(' ');
 		var capitalizedState = '';
 		for (i = 0; i < splitState.length; i++) { 
 			if ((i != splitState.length) && (i != 0)) capitalizedState += ' ';
@@ -537,7 +558,7 @@
 	//Convert long/full state names to abbreviations
 	function abbrevState(someState) {
 		console.log(someState);
-		var state = someState.capitalizeFirstLetter();
+		var state = capitalizeFirstLetter(someState);
 		var states = {
 			'Alabama': 'AL',
 			'Alaska': 'AK',
