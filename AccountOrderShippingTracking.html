@@ -389,6 +389,7 @@
 				return {
 					index: shipStatusIndex,
 					acceptedDate: acceptedDate,
+					afterAccept: trackingDetails.length - 2,
 					deliveredDate: deliveredDate,
 					deliveredAddress: deliveredAddress
 				};
@@ -404,7 +405,7 @@
 	function animateTrackerLine(shipStatusData) {
 		console.log('HELLO!');
 		console.log(shipStatusData);
-		console.log(shipStatusData.acceptedDate);
+		var configIndex = shipStatusData.index;
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingConfig = [{"dotPos":{"side":"left","cord":"12"},"text":"We\'ve got your order"},
 							  {"dotPos":{"side":"left","cord":"28"},"text":"The carrier now has the package"},
@@ -414,12 +415,13 @@
 		var progressStatus = $('.package-status');
 		var progressStatusSpan = $('.latest-event-status');
 		var progressStatusDot = $('.latest-event-dot');
-		var progressStatusSide = shippingConfig[shipStatusData.index].dotPos.side;
-		var progressStatusCord = shippingConfig[shipStatusData.index].dotPos.cord;
-		var newDotCords = {[progressStatusSide]:progressStatusCord};
-		var progressStatusText = shippingConfig[shipStatusData.index].text;
+		var progressStatusSide = shippingConfig[configIndex].dotPos.side;
+		var progressStatusCord = shippingConfig[configIndex].dotPos.cord;
+		var progressStatusText = shippingConfig[configIndex].text;
+		var shippedMultiplier = shipStatusData.afterAccept * 6;
 		var shippEDDateField = $('.shipped-date');
 		progressStatusSpan.html(progressStatusText);
+
 		if (shipStatusData.index == 0) {
 			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
 			$(window).load(function(){
@@ -443,13 +445,14 @@
 				}, 1370);
 			})
 		} else if (shipStatusData.index == 2) {
-			var thisWidth = ((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100;
+			var aAWidth = (((domTrackerLine.width() * (progressStatusCord*0.01) + 24) / domTrackerLine.width()) * 100) + shippedMultiplier;
+			var aACord = parseInt(progressStatusCord) + shippedMultiplier;
 			shippEDDateField.html(shipStatusData.acceptedDate);
 			$(window).load(function(){
 				setTimeout(function(){
-					progressStatus.animate({'width':''+thisWidth+'%'}, 3700);
+					progressStatus.animate({'width':''+aAWidth+'%'}, 3700);
 					setTimeout(function(){$('.shipped-status').fadeIn()}, 2800);
-					progressStatusDot.animate({'left':''+progressStatusCord+'%'}, 3700, function() {
+					progressStatusDot.animate({'left':''+aACord+'%'}, 3700, function() {
 						progressStatusSpan.css({'width':'134px'}).fadeIn('1300');
 					});
 				}, 1370);
