@@ -160,8 +160,6 @@
 <script type="text/javascript">
 	var pageEnd = $('#AccountOrder .BlockContent');
 	var trackingNumber = $('.CartContents.OrderShipments tbody .TrackingNumber').text();
-	//%%GLOBAL_ShipAddressLine1%% %%GLOBAL_ShipAddressLine2%%, %%GLOBAL_ShipSuburb%%, 
-	//%%GLOBAL_ShipState%% %%GLOBAL_ShipZip%%, %%GLOBAL_ShipCountry%%​​
 	if ($('.ShippingDetails .address-country').text().toUpperCase().trim() == 'UNITED STATES') {
 		var shippingAddress = $('.ShippingDetails .address-city').text() + ', ' + abbrevState($('.ShippingDetails .address-state').text());
 	} else {
@@ -178,13 +176,8 @@
 			USPSTracking(shippingTrackingNumber, animateTrackerLine);
 		} else if (shippingTrackingNumber.length == 18) {
 			makeTrackingLink("FedEx", shippingTrackingNumber);
-			//animateTrackerLine();
-			//FedExTracking(shippingTrackingNumber);
 		} else if ((shippingTrackingNumber.length == 12) && (shippingTrackingNumber.length == 14)) {
-			//starts with 1Z
 			makeTrackingLink("UPS", shippingTrackingNumber);
-			//animateTrackerLine();
-			//FedExTracking(shippingTrackingNumber);
 		}
 	}
 	
@@ -197,6 +190,8 @@
 		trackingAnchorLink += '' + shippingTrackingNumber + '" target="_blank" class="green">' + shippingTrackingNumber + '</a>';
 		$('.CartContents.OrderShipments tbody .TrackingNumber').html(trackingAnchorLink);
 	}
+	
+	//Create tracker line, which will be animated later, after status and data is retrieved and parsed
 	function createTrackerLine(currentLocation) {
 		//Tracker line Bottom
 		var orderMonthDay = formatDate('%%GLOBAL_OrderDate%%');
@@ -216,7 +211,6 @@
 
 	function USPSTracking(shippingTrackingNumber, callback) {
 		var httpPrefix = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		console.log(httpPrefix);
 		var corsAnyUrl = '//cors-anywhere.herokuapp.com/';
 		var BCTrackingID = '%%GLOBAL_TrackingLink%%';
 		if (isNumeric(BCTrackingID.charAt(0))) {
@@ -224,14 +218,12 @@
 		} else {
 			var trackingLinkID = BCTrackingID.split('rackNum=')[1].split('" target=')[0];
 		}
-		console.log(trackingLinkID);
 
 		var USPSId = '689DSSHI5238';
 		var USPSUrl1 = '//production.shippingapis.com/ShippingApi.dll?API=TrackV2&XML=<TrackFieldRequest USERID="';
 		var USPSUrl2 = '"><TrackID ID="'+trackingLinkID+'"></TrackID></TrackFieldRequest>'
 		var USPSUrl = httpPrefix + corsAnyUrl + USPSUrl1 + USPSId + USPSUrl2;
 		function getUSPSData(trackUrl, callback) {	
-			console.log(trackUrl);	
 			$.ajax({
 				url: trackUrl,
 				type: "post",
@@ -248,7 +240,6 @@
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
 	        var trackingResponse = trackingJSON.TrackResponse;
-	        console.log(trackingResponse);
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
 	        var trackingSummary = trackingInfo.TrackSummary;
@@ -270,21 +261,15 @@
 	        console.log("Tracking Event Name:" + trackingSumEventEventName);
 */
 
-			console.log(trackingSummary.EventCountry);
-			console.log(trackingSumEventCity, trackingSumEventState);
 			if (!trackingSummary.EventCountry) {
 				var currentLoc = trackingSummary.EventCountry;
-			console.log(currentLoc);
 			} else {
 				var currentLoc = trackingSumEventCity + trackingSumEventState;
-			console.log(currentLoc);
 			}
-			console.log(currentLoc);
 			createTrackerLine(currentLoc);
 
 			// IF already delivered, add green bubble with 
 			var alreadyDelivered = trackingSumEvent.indexOf("Delivered") != -1;
-	        console.log('has it been delivered?', alreadyDelivered);
 			if (alreadyDelivered) {
 				var delAttText = {
 					"01": "In/At your Mailbox",
@@ -302,7 +287,6 @@
 				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
 				tableRows += '<tr class="summary-row"><td colspan="3"><div>'+summaryRowText+'</div></td>';
 			}
-			console.log(tableRows);
 /*
 			if(trackingInfo.hasOwnProperty('GuaranteedDeliveryDate')){
 				var guarDelDate = trackingJSON.TrackResponse.TrackInfo.GuaranteedDeliveryDate["#text"];
@@ -347,13 +331,9 @@
 			var tableBody = '<tbody>' + tableRows + '</tbody>';
 			var trackingTable = '<table class="USPS-table tracking-table">' +  tableHead + tableBody + '</table>';
 			pageEnd.append(trackingTable);
-			console.log(trackingTable);
 
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
+			// Retrieve USPS data and parse for status and details
 			function USPSStatus (){
-				// new function for searching
-				// new function for searching
 			    var historyDates = {
 			        "Pre-Shipment Info Sent to USPS": "",
 			        "Accepted at USPS Origin Sort Facility": "",
@@ -387,13 +367,9 @@
 			            }
 			        }
 			    }
-				console.log(historyDates);
-				console.log(historyDates["Accepted at USPS Origin Sort Facility"]);
 				var alreadyAccepted = historyDates["Accepted at USPS Origin Sort Facility"] != '' ? true : false;
 				var acceptedDate = alreadyAccepted ? formatDate(historyDates["Accepted at USPS Origin Sort Facility"]) : '';
-				// new function for searching
 				var afterAcceptance = trackingDetails.length > 1 ? true : false;
-				// new function for searching
 				
 				if (alreadyDelivered) {
 					shipStatusIndex = 3;
@@ -401,7 +377,6 @@
 					var deliveredAddress = '' + trackingSummary.EventCity["#text"] + ', ' + trackingSummary.EventState["#text"];
 				} else if (afterAcceptance) {
 					shipStatusIndex = 2;
-					console.log('there are this many items in details', trackingDetails.length);
 				} else if (alreadyAccepted) {
 					shipStatusIndex = 1;
 				} else {
@@ -416,16 +391,12 @@
 				};
 			}
 			$.when(USPSStatus(trackingSumEvent)).then(function(shipStatusData){animateTrackerLine(shipStatusData);});
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
-			// Working on this hurrrrr Working on this hurrrrr Working on this hurrrrr
 		}
 		var ajaxCallback = function (xml) {createUSPSTable(xml);}
 		getUSPSData(USPSUrl, ajaxCallback);
 	}
 	
 	function animateTrackerLine(shipStatusData) {
-		console.log('HELLO!');
-		console.log(shipStatusData);
 		var configIndex = shipStatusData.index;
 		//Tracking Dot and Status Position -- ordered, shipped, delivered
 		var shippingConfig = [{"dotPos":{"side":"left","cord":"12"},"text":"We\'ve got your order"},
@@ -437,7 +408,6 @@
 		var progressStatusSpan = $('.latest-event-status');
 		var progressStatusSpanText = $('.latest-event-status span');
 		var progressStatusScan = $('.latest-event-status i');
-		console.log(progressStatusSpanText);
 		var progressStatusDot = $('.latest-event-dot');
 		var progressStatusSide = shippingConfig[configIndex].dotPos.side;
 		var progressStatusCord = shippingConfig[configIndex].dotPos.cord;
@@ -489,7 +459,7 @@
 				progressStatus.animate({'width':'100%'}, 3700);
 				setTimeout(function(){$('.shipped-status').fadeIn()}, 1300);
 				progressStatusDot.animate({'right':''+progressStatusCord+''}, 3700, function() {
-					progressStatusSpan.css({'left':'auto','right':'0','text-align':'right'}).fadeIn('1300');
+					progressStatusSpan.css({'left':'auto','right':'0','text-align':'right','left':'-119px'}).fadeIn('1300');
 				});
 			})
 		}
@@ -557,7 +527,6 @@
 	}
 	//Convert long/full state names to abbreviations
 	function abbrevState(someState) {
-		console.log(someState);
 		var state = capitalizeFirstLetter(someState);
 		var states = {
 			'Alabama': 'AL',
