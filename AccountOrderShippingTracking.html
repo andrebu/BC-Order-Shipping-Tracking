@@ -231,7 +231,10 @@
 					callback(xml);
 				},
 				error: function(xhr, textStatus, errorThrown){
-			        console.log("Error? --- " + xhr.responseText);
+			        console.log("Error? --- ", xhr);
+			        console.log("Error? --- ", xhr.responseText);
+			        console.log("textStatus? --- ", textStatus);
+			        console.log("ErrorThrown --- ", errorThrown);
 				}
 			});
 		}
@@ -240,6 +243,7 @@
 	        var trackingJSON = xmlToJson(xml);
 	        var trackingString = JSON.stringify(xmlToJson(xml));
 	        var trackingResponse = trackingJSON.TrackResponse;
+	        console.log( trackingResponse );
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
 	        var trackingSummary = trackingInfo.TrackSummary;
