@@ -246,6 +246,7 @@
 	        console.log( trackingResponse );
 	        var trackingInfo = trackingResponse.TrackInfo;
 	        var trackingID = trackingInfo["@attributes"].ID;
+	        if (!trackingInfo.TrackSummary) return;
 	        var trackingSummary = trackingInfo.TrackSummary;
 	        var trackingSumEventTime = trackingSummary.EventTime["#text"] ? ', ' + trackingSummary.EventTime["#text"] : '';
 	        var trackingSumEventDate = trackingSummary.EventDate["#text"];
@@ -284,8 +285,12 @@
 					"06": "to Other at Address (Garage/Side or Back Door/Porch)",
 					"07": "and left with Neighbor (by Request)"
 				};
-				var delAttCode = trackingSummary.DeliveryAttributeCode["#text"];
-				var summaryRowText = 'Your item was delivered '+delAttText[delAttCode]+' at '+trackingSumEventTime+' ';
+				if ( trackingSummary.DeliveryAttributeCode ) {
+					var delAttCode = trackingSummary.DeliveryAttributeCode["#text"];
+					var summaryRowText = 'Your item was delivered '+delAttText[delAttCode]+' at '+trackingSumEventTime+' ';
+				} else {
+					var summaryRowText = 'Your item was delivered at '+trackingSumEventTime+' ';					
+				}
 				summaryRowText += 'on '+trackingSumEventDate+' in '+trackingSumEventCity+', '+trackingSumEventState+'  ';
 				summaryRowText += ''+trackingSumEventEventZIPCode+'';
 				tableRows += '<tr class="pre-sum-row"><td colspan="3"><div class="summary-triangle"></div></td></tr>';
